@@ -14,8 +14,6 @@ Sources for native/core comparison: [Raycast Manual](https://manual.raycast.com/
 | [contrast](./delphitools/contrast.md) | Easy | Easy | ✗ | Not started |
 | [convert](./delphitools/convert.md) | Moderate | Moderate | ✗ | Not started |
 | [crop](./delphitools/crop.md) | Moderate | Moderate | ✗ | Not started |
-| [decode base64](./delphitools/decode.md) | Easy | Easy | ✗ | Not started |
-| [encode base64](./delphitools/encode.md) | Easy | Easy | ✗ | Not started |
 | [favicon](./delphitools/favicon.md) | Moderate | Moderate | ✗ | Not started |
 | [font-info](./delphitools/font-info.md) | Moderate | Moderate | ✗ | Not started |
 | [harmony](./delphitools/harmony.md) | Easy | Easy | ✗ | Not started |
@@ -39,6 +37,13 @@ Sources for native/core comparison: [Raycast Manual](https://manual.raycast.com/
 | [trace](./delphitools/trace.md) | Hard | Moderate | ✗ | Not started |
 | [watermark](./delphitools/watermark.md) | Moderate | Moderate | ✗ | Not started |
 | [zine](./delphitools/zine.md) | Hard | Moderate | ✗ | Not started |
+
+## Implemented
+
+| Tool | Extension hardness | Raycast ease | Native? | Progress |
+| --- | --- | --- | --- | --- |
+| [decode](./delphitools/decode.md) | Easy | Easy | ✗ | Implemented as a clipboard/selection-first Command with base64 and URL support |
+| [encode](./delphitools/encode.md) | Easy | Easy | ✗ | Implemented as a clipboard/selection-first Command with base64 and URL support |
 
 ## Not planned (already in Raycast core)
 

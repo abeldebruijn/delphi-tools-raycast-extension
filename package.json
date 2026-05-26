@@ -36,6 +36,18 @@
       "name": "delphi-tools",
       "title": "delphitools",
       "description": "Wrapper for delphitools"
+    },
+    {
+      "mode": "view",
+      "name": "encode",
+      "title": "Encode Text",
+      "description": "Encode text as base64 or URL encoding"
+    },
+    {
+      "mode": "view",
+      "name": "decode",
+      "title": "Decode Text",
+      "description": "Decode base64 or URL-encoded text"
     }
   ],
   "title": "delphi-tools-raycast-extension",
