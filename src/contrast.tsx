@@ -492,6 +492,8 @@ function getDetailMarkdown(result: ContrastResult): string {
   const hintSection = fixHintText ? `\n## Hint\n${fixHintText}\n` : "";
 
   return [
+    `![Contrast preview](${getContrastPreviewImageUrl(result)})`,
+    "",
     `# ${result.ratio.toFixed(2)}:1`,
     `Contrast Ratio: ${getRatioLabel(result.ratio)}`,
     hintSection,
@@ -521,9 +523,18 @@ function getDetailMarkdown(result: ContrastResult): string {
     .join("\n");
 }
 
+function getContrastPreviewImageUrl(result: ContrastResult): string {
+  const params = new URLSearchParams({
+    fg: result.fg,
+    bg: result.bg,
+  });
+
+  return `http://localhost:3000/contrast-checker/image?${params.toString()}`;
+}
+
 function getFixHintText(result: ContrastResult | undefined): string {
   if (!result) {
-    return " ";
+    return "";
   }
 
   const hints = [];
