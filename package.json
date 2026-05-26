@@ -26,11 +26,16 @@
   "icon": "extension-icon.png",
   "commands": [
     {
-      "mode": "no-view",
+      "mode": "view",
+      "name": "check-delphitools-install",
+      "title": "Check delphitools Install",
+      "description": "Check whether delphitools is installed"
+    },
+    {
+      "mode": "view",
       "name": "delphi-tools",
-      "title": "Delphi tools",
-      "description": "Wrapper for delphi tools",
-      "subtitle": ""
+      "title": "delphitools",
+      "description": "Wrapper for delphitools"
     }
   ],
   "title": "delphi-tools-raycast-extension",

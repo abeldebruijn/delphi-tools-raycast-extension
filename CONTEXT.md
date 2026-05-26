@@ -12,10 +12,6 @@ _Avoid_: delphi-tools, Delphi CLI, CLI replacement
 The tool suite and product context behind delphitools. It does not mean the Delphi programming language or unrelated Delphi tooling.
 _Avoid_: Delphi language, Embarcadero Delphi
 
-**Raycast Extension**:
-The user-facing workflow layer that exposes delphitools inside Raycast. It presents commands, forms, results, clipboard actions, and install guidance without owning the tool logic.
-_Avoid_: CLI replacement, web wrapper
-
 **Tool**:
 One focused utility from the delphitools catalogue. A Tool belongs to delphitools and may be exposed as its own Raycast command.
 _Avoid_: App, feature, website page
@@ -24,6 +20,30 @@ _Avoid_: App, feature, website page
 A machine-readable description of available Tools and their input/output shape. The Raycast Extension uses it as the source of truth for per-tool commands.
 _Avoid_: Website scrape, web API, hard-coded catalogue
 
+**Action**:
+A small Raycast function available inside an Action Panel for the current command context. Actions control or transform the selected item, such as copying a link, assigning a label, or triggering another focused operation.
+_Avoid_: Command, Tool
+
+**Action Panel**:
+The Raycast surface that lists the Actions available for the current command context. It is opened with Command-K and is used to discover and run contextual Actions.
+_Avoid_: Menu, command palette
+
+**Command**:
+A Raycast Extension entry point that appears in Raycast root search. Commands can be scripts, lists, forms, or richer Raycast UI flows.
+_Avoid_: Action, Raycast Tool
+
+**Extension**:
+A Raycast package that adds functionality to Raycast. An Extension contains one or more Commands and can be installed from the Raycast Store.
+_Avoid_: App, plugin, script
+
+**Manifest**:
+The package.json file for a Raycast Extension. It is an npm package manifest plus Raycast-specific metadata used to identify and publish the Extension.
+_Avoid_: CLI Manifest, config file
+
+**Raycast Tool**:
+A Raycast Extension entry point that is only available to Raycast AI. Raycast Tools do not appear in root search and users do not interact with them directly.
+_Avoid_: Command, Action, delphitools Tool
+
 ## Flagged Ambiguities
 
 **delphi-tools**:
@@ -31,3 +51,6 @@ Use only for repository, package, or generated command naming. In product langua
 
 **Wrapper**:
 Use **Raycast Extension** when referring to the user-facing Raycast layer. The extension wraps local CLI execution, not the delphitools website.
+
+**Tool**:
+The existing glossary uses **Tool** for a delphitools utility. Use **Raycast Tool** when referring to Raycast's callable extension entry point.

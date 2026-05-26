@@ -1,0 +1,90 @@
+import { Action, ActionPanel, Detail, Icon } from "@raycast/api";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
+const INSTALL_COMMAND = "cargo install delphitools-cli";
+
+type DelphitoolsInstallStatus =
+  | {
+      installed: true;
+      version: string;
+    }
+  | {
+      installed: false;
+    };
+
+export async function getDelphitoolsInstallStatus(): Promise<DelphitoolsInstallStatus> {
+  try {
+    const { stdout } = await execFileAsync("delphitools", ["--version"]);
+    return {
+      installed: true,
+      version: stdout.trim(),
+    };
+  } catch {
+    return {
+      installed: false,
+    };
+  }
+}
+
+export function DelphitoolsInstallStatusView({
+  status,
+}: {
+  status: DelphitoolsInstallStatus;
+}) {
+  if (!status.installed) {
+    return (
+      <Detail
+        markdown={`# delphitools is not installed
+
+Install the local CLI before using this Raycast Extension.
+
+\`\`\`sh
+${INSTALL_COMMAND}
+\`\`\`
+`}
+        actions={
+          <ActionPanel>
+            <Action.CopyToClipboard
+              title="Copy Install Command"
+              content={INSTALL_COMMAND}
+            />
+          </ActionPanel>
+        }
+        metadata={
+          <Detail.Metadata>
+            <Detail.Metadata.Label
+              title="Status"
+              text="Not installed"
+              icon={Icon.XMarkCircle}
+            />
+            <Detail.Metadata.Label title="Executable" text="delphitools" />
+          </Detail.Metadata>
+        }
+      />
+    );
+  }
+
+  return (
+    <Detail
+      markdown={`# delphitools is installed
+
+${status.version || "The local CLI is available on PATH."}
+`}
+      metadata={
+        <Detail.Metadata>
+          <Detail.Metadata.Label
+            title="Status"
+            text="Installed"
+            icon={Icon.CheckCircle}
+          />
+          <Detail.Metadata.Label title="Executable" text="delphitools" />
+          {status.version ? (
+            <Detail.Metadata.Label title="Version" text={status.version} />
+          ) : null}
+        </Detail.Metadata>
+      }
+    />
+  );
+}
