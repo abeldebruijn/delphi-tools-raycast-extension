@@ -1,0 +1,656 @@
+import type { LaunchProps } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Clipboard,
+  Detail,
+  Form,
+  getSelectedText,
+  Icon,
+  showToast,
+  Toast,
+} from "@raycast/api";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { useEffect, useRef, useState } from "react";
+
+import {
+  DelphitoolsInstallStatusView,
+  getDelphitoolsInstallStatus,
+} from "./delphitools-install";
+
+const execFileAsync = promisify(execFile);
+
+type HarmonyType =
+  | "complementary"
+  | "analogous"
+  | "triadic"
+  | "split-complementary"
+  | "tetradic"
+  | "monochromatic"
+  | "double-complementary"
+  | "compound"
+  | "pentadic"
+  | "analogous-accent"
+  | "golden"
+  | "near-complementary";
+
+type CliHarmonyType =
+  | "complementary"
+  | "analogous"
+  | "triadic"
+  | "tetradic"
+  | "split";
+
+type FormValues = {
+  colour: string;
+  harmonyType: HarmonyType;
+};
+
+type HarmonyResult = {
+  colour: string;
+  harmonyType: HarmonyType;
+  colours: string[];
+};
+
+const DEFAULT_COLOUR = "#3b82f6";
+const DEFAULT_HARMONY_TYPE: HarmonyType = "complementary";
+
+const HARMONY_TYPES: Array<{ label: string; value: HarmonyType }> = [
+  { label: "Complementary", value: "complementary" },
+  { label: "Analogous", value: "analogous" },
+  { label: "Triadic", value: "triadic" },
+  { label: "Split-Complementary", value: "split-complementary" },
+  { label: "Tetradic (Square)", value: "tetradic" },
+  { label: "Monochromatic", value: "monochromatic" },
+  { label: "Double Complementary", value: "double-complementary" },
+  { label: "Compound", value: "compound" },
+  { label: "Pentadic", value: "pentadic" },
+  { label: "Analogous Accent", value: "analogous-accent" },
+  { label: "Golden Ratio", value: "golden" },
+  { label: "Near Complementary", value: "near-complementary" },
+];
+
+export default function Command(
+  props: LaunchProps<{ arguments: Arguments.Harmony }>,
+) {
+  return (
+    <HarmonyCommand
+      initialColour={props.arguments.colour}
+      initialHarmonyType={getInitialHarmonyType(props.arguments.harmonyType)}
+    />
+  );
+}
+
+function HarmonyCommand({
+  initialColour = "",
+  initialHarmonyType = DEFAULT_HARMONY_TYPE,
+}: {
+  initialColour?: string;
+  initialHarmonyType?: HarmonyType;
+}) {
+  const [isDelphitoolsInstalled, setIsDelphitoolsInstalled] =
+    useState<boolean>();
+
+  useEffect(() => {
+    async function checkInstallStatus() {
+      const status = await getDelphitoolsInstallStatus();
+
+      setIsDelphitoolsInstalled(status.installed);
+    }
+
+    checkInstallStatus();
+  }, []);
+
+  if (isDelphitoolsInstalled === false) {
+    return <DelphitoolsInstallStatusView status={{ installed: false }} />;
+  }
+
+  return (
+    <HarmonyForm
+      initialColour={initialColour}
+      initialHarmonyType={initialHarmonyType}
+    />
+  );
+}
+
+function HarmonyForm({
+  initialColour,
+  initialHarmonyType,
+}: {
+  initialColour: string;
+  initialHarmonyType: HarmonyType;
+}) {
+  const [values, setValues] = useState<FormValues>({
+    colour: initialColour || DEFAULT_COLOUR,
+    harmonyType: initialHarmonyType,
+  });
+  const [result, setResult] = useState<HarmonyResult>();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const lastToastErrorRef = useRef("");
+  const canCopy = Boolean(result?.colours.length);
+
+  useEffect(() => {
+    async function hydrateInitialColour() {
+      const colour = await getInitialColour();
+
+      if (!colour) {
+        return;
+      }
+
+      setValues((currentValues) => {
+        if (currentValues.colour !== DEFAULT_COLOUR) {
+          return currentValues;
+        }
+
+        return {
+          ...currentValues,
+          colour,
+        };
+      });
+    }
+
+    hydrateInitialColour();
+  }, []);
+
+  useEffect(() => {
+    if (!values.colour.trim()) {
+      setResult(undefined);
+      lastToastErrorRef.current = "";
+      setIsProcessing(false);
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const timeout = setTimeout(async () => {
+      try {
+        const colours = await runHarmony(values.colour, values.harmonyType);
+
+        setResult({
+          colour: values.colour,
+          harmonyType: values.harmonyType,
+          colours,
+        });
+        lastToastErrorRef.current = "";
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        const toastErrorKey = `${values.harmonyType}:${values.colour}:${message}`;
+
+        setResult(undefined);
+
+        if (lastToastErrorRef.current !== toastErrorKey) {
+          lastToastErrorRef.current = toastErrorKey;
+          await showToast({
+            style: Toast.Style.Failure,
+            title: "Could not generate harmony",
+            message,
+          });
+        }
+      } finally {
+        setIsProcessing(false);
+      }
+    }, 250);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [values.colour, values.harmonyType]);
+
+  async function copyColours() {
+    if (!result) {
+      return;
+    }
+
+    await Clipboard.copy(result.colours.join("\n"));
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Copied Harmony Colours",
+    });
+  }
+
+  async function copyCssVariables() {
+    if (!result) {
+      return;
+    }
+
+    await Clipboard.copy(formatCssVariables(result));
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Copied CSS Variables",
+    });
+  }
+
+  return (
+    <Form
+      isLoading={isProcessing}
+      actions={
+        <ActionPanel>
+          {result ? (
+            <Action.Push
+              icon={Icon.Eye}
+              title="Show Harmony Preview"
+              target={<HarmonyDetail result={result} />}
+            />
+          ) : null}
+          <Action
+            icon={Icon.Clipboard}
+            title="Copy Harmony Colours"
+            onAction={copyColours}
+          />
+          <Action
+            icon={Icon.Code}
+            title="Copy CSS Variables"
+            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+            onAction={copyCssVariables}
+          />
+          <Action.CopyToClipboard
+            title="Copy Base Colour"
+            content={values.colour}
+            shortcut={{ modifiers: ["cmd"], key: "b" }}
+          />
+          {canCopy
+            ? result.colours.map((colour, index) => (
+                <Action.CopyToClipboard
+                  key={`${colour}-${index}`}
+                  title={`Copy Colour ${index + 1}`}
+                  content={colour}
+                  shortcut={
+                    index < 9
+                      ? { modifiers: ["cmd"], key: String(index + 1) }
+                      : undefined
+                  }
+                />
+              ))
+            : null}
+        </ActionPanel>
+      }
+    >
+      <Form.TextField
+        id="colour"
+        title="Base Colour"
+        placeholder="#3b82f6, blue, rgb(59 130 246), hsl(217 91% 60%)"
+        value={values.colour}
+        onChange={(colour) =>
+          setValues((currentValues) => ({
+            ...currentValues,
+            colour,
+          }))
+        }
+      />
+      <Form.Dropdown
+        id="harmonyType"
+        title="Harmony Type"
+        value={values.harmonyType}
+        onChange={(harmonyType) =>
+          setValues((currentValues) => ({
+            ...currentValues,
+            harmonyType: harmonyType as HarmonyType,
+          }))
+        }
+      >
+        {HARMONY_TYPES.map((harmonyType) => (
+          <Form.Dropdown.Item
+            key={harmonyType.value}
+            title={harmonyType.label}
+            value={harmonyType.value}
+          />
+        ))}
+      </Form.Dropdown>
+      <Form.Description
+        title="Harmony Colours"
+        text={getResultText(result, isProcessing)}
+      />
+    </Form>
+  );
+}
+
+function HarmonyDetail({ result }: { result: HarmonyResult }) {
+  async function copyColours() {
+    await Clipboard.copy(result.colours.join("\n"));
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Copied Harmony Colours",
+    });
+  }
+
+  async function copyCssVariables() {
+    await Clipboard.copy(formatCssVariables(result));
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Copied CSS Variables",
+    });
+  }
+
+  return (
+    <Detail
+      markdown={getDetailMarkdown(result)}
+      actions={
+        <ActionPanel>
+          <Action
+            icon={Icon.Clipboard}
+            title="Copy Harmony Colours"
+            onAction={copyColours}
+          />
+          <Action
+            icon={Icon.Code}
+            title="Copy CSS Variables"
+            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+            onAction={copyCssVariables}
+          />
+          {result.colours.map((colour, index) => (
+            <Action.CopyToClipboard
+              key={`${colour}-${index}`}
+              title={`Copy Colour ${index + 1}`}
+              content={colour}
+              shortcut={
+                index < 9
+                  ? { modifiers: ["cmd"], key: String(index + 1) }
+                  : undefined
+              }
+            />
+          ))}
+        </ActionPanel>
+      }
+      metadata={
+        <Detail.Metadata>
+          <Detail.Metadata.Label
+            title="Base Colour"
+            text={result.colours[0] ?? result.colour}
+            icon={{
+              source: Icon.Circle,
+              tintColor: result.colours[0] ?? result.colour,
+            }}
+          />
+          <Detail.Metadata.Label
+            title="Harmony Type"
+            text={getHarmonyTypeLabel(result.harmonyType)}
+          />
+          <Detail.Metadata.Separator />
+          {result.colours.map((colour, index) => (
+            <Detail.Metadata.Label
+              key={`${colour}-${index}`}
+              title={`Colour ${index + 1}`}
+              text={colour}
+              icon={{ source: Icon.Circle, tintColor: colour }}
+            />
+          ))}
+        </Detail.Metadata>
+      }
+    />
+  );
+}
+
+async function getInitialColour(): Promise<string> {
+  try {
+    const selectedText = await getSelectedText();
+
+    if (selectedText.trim()) {
+      return selectedText.trim();
+    }
+  } catch {
+    // Selection is optional; clipboard is the fallback source.
+  }
+
+  return ((await Clipboard.readText()) ?? "").trim();
+}
+
+async function runHarmony(
+  colour: string,
+  harmonyType: HarmonyType,
+): Promise<string[]> {
+  const cliHarmonyType = getCliHarmonyType(harmonyType);
+
+  if (cliHarmonyType) {
+    const { stdout } = await execFileAsync("delphitools", [
+      "harmony",
+      "--json",
+      colour,
+      cliHarmonyType,
+    ]);
+    const parsed = JSON.parse(stdout) as unknown;
+
+    if (
+      !Array.isArray(parsed) ||
+      !parsed.every((value) => typeof value === "string")
+    ) {
+      throw new Error("Unexpected harmony output from delphitools.");
+    }
+
+    return parsed;
+  }
+
+  const baseHex = await normaliseColour(colour);
+
+  return getLocalHarmony(baseHex, harmonyType);
+}
+
+async function normaliseColour(colour: string): Promise<string> {
+  const { stdout } = await execFileAsync("delphitools", [
+    "colour",
+    "--json",
+    colour,
+    "hex",
+  ]);
+  const parsed = JSON.parse(stdout) as { hex?: unknown };
+
+  if (typeof parsed.hex !== "string") {
+    throw new Error("Unexpected colour output from delphitools.");
+  }
+
+  return parsed.hex;
+}
+
+function getCliHarmonyType(
+  harmonyType: HarmonyType,
+): CliHarmonyType | undefined {
+  switch (harmonyType) {
+    case "complementary":
+    case "analogous":
+    case "triadic":
+    case "tetradic":
+      return harmonyType;
+    case "split-complementary":
+      return "split";
+    default:
+      return undefined;
+  }
+}
+
+function getInitialHarmonyType(harmonyType: string | undefined): HarmonyType {
+  return isHarmonyType(harmonyType) ? harmonyType : DEFAULT_HARMONY_TYPE;
+}
+
+function isHarmonyType(
+  harmonyType: string | undefined,
+): harmonyType is HarmonyType {
+  return HARMONY_TYPES.some((item) => item.value === harmonyType);
+}
+
+function getHarmonyTypeLabel(harmonyType: HarmonyType): string {
+  return (
+    HARMONY_TYPES.find((item) => item.value === harmonyType)?.label ??
+    "Complementary"
+  );
+}
+
+function getResultText(
+  result: HarmonyResult | undefined,
+  isProcessing: boolean,
+): string {
+  if (isProcessing) {
+    return result ? `${result.colours.join(", ")}...` : "...";
+  }
+
+  return result?.colours.join(", ") || " ";
+}
+
+function getDetailMarkdown(result: HarmonyResult): string {
+  return [
+    `![Harmony preview](${getHarmonyPreviewImageUrl(result)})`,
+    "",
+    `# ${getHarmonyTypeLabel(result.harmonyType)}`,
+    "",
+    result.colours.map((colour) => `- \`${colour}\``).join("\n"),
+  ].join("\n");
+}
+
+function getHarmonyPreviewImageUrl(result: HarmonyResult): string {
+  const params = new URLSearchParams({
+    base: result.colours[0] ?? result.colour,
+    type: getPreviewHarmonyType(result.harmonyType),
+  });
+
+  return `http://localhost:3000/harmony-genny/image?${params.toString()}`;
+}
+
+function getPreviewHarmonyType(harmonyType: HarmonyType): string {
+  return harmonyType;
+}
+
+function getLocalHarmony(baseHex: string, harmonyType: HarmonyType): string[] {
+  const baseRgb = hexToRgb(baseHex);
+
+  if (!baseRgb) {
+    throw new Error(`Invalid colour: ${baseHex}`);
+  }
+
+  const [hue, saturation, lightness] = rgbToHsl(baseRgb);
+
+  if (harmonyType === "monochromatic") {
+    return [
+      hslToHex(hue, saturation, clamp(lightness - 0.22)),
+      hslToHex(hue, saturation, lightness),
+      hslToHex(hue, saturation, clamp(lightness + 0.18)),
+      hslToHex(hue, clamp(saturation * 0.55), clamp(lightness + 0.32)),
+    ];
+  }
+
+  return getHarmonyOffsets(harmonyType).map((offset) =>
+    hslToHex(rotateHue(hue + offset), saturation, lightness),
+  );
+}
+
+function getHarmonyOffsets(harmonyType: HarmonyType): number[] {
+  switch (harmonyType) {
+    case "double-complementary":
+      return [0, 30, 180, 210];
+    case "compound":
+      return [0, 150, 180, 210];
+    case "pentadic":
+      return [0, 72, 144, 216, 288];
+    case "analogous-accent":
+      return [0, 30, -30, 180];
+    case "golden":
+      return [0, 137.5, 275];
+    case "near-complementary":
+      return [0, 165, 195];
+    default:
+      return [0];
+  }
+}
+
+function hexToRgb(hex: string): [number, number, number] | undefined {
+  const normalised = hex.trim().replace(/^#/, "");
+  const full =
+    normalised.length === 3
+      ? normalised
+          .split("")
+          .map((character) => character + character)
+          .join("")
+      : normalised;
+
+  if (!/^[0-9a-fA-F]{6}$/.test(full)) {
+    return undefined;
+  }
+
+  return [
+    Number.parseInt(full.slice(0, 2), 16),
+    Number.parseInt(full.slice(2, 4), 16),
+    Number.parseInt(full.slice(4, 6), 16),
+  ];
+}
+
+function rgbToHsl(
+  rgb: readonly [number, number, number],
+): [number, number, number] {
+  const red = rgb[0] / 255;
+  const green = rgb[1] / 255;
+  const blue = rgb[2] / 255;
+  const max = Math.max(red, green, blue);
+  const min = Math.min(red, green, blue);
+  const lightness = (max + min) / 2;
+
+  if (max === min) {
+    return [0, 0, lightness];
+  }
+
+  const delta = max - min;
+  const saturation =
+    lightness > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+  let hue = 0;
+
+  if (max === red) {
+    hue = (green - blue) / delta + (green < blue ? 6 : 0);
+  } else if (max === green) {
+    hue = (blue - red) / delta + 2;
+  } else {
+    hue = (red - green) / delta + 4;
+  }
+
+  return [hue * 60, saturation, lightness];
+}
+
+function hslToHex(hue: number, saturation: number, lightness: number): string {
+  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+  const huePrime = rotateHue(hue) / 60;
+  const x = chroma * (1 - Math.abs((huePrime % 2) - 1));
+  const match = lightness - chroma / 2;
+  let red = 0;
+  let green = 0;
+  let blue = 0;
+
+  if (huePrime < 1) {
+    red = chroma;
+    green = x;
+  } else if (huePrime < 2) {
+    red = x;
+    green = chroma;
+  } else if (huePrime < 3) {
+    green = chroma;
+    blue = x;
+  } else if (huePrime < 4) {
+    green = x;
+    blue = chroma;
+  } else if (huePrime < 5) {
+    red = x;
+    blue = chroma;
+  } else {
+    red = chroma;
+    blue = x;
+  }
+
+  return rgbToHex([
+    Math.round((red + match) * 255),
+    Math.round((green + match) * 255),
+    Math.round((blue + match) * 255),
+  ]);
+}
+
+function rgbToHex(rgb: readonly [number, number, number]): string {
+  return `#${rgb.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function rotateHue(hue: number): number {
+  return ((hue % 360) + 360) % 360;
+}
+
+function clamp(value: number): number {
+  return Math.min(1, Math.max(0, value));
+}
+
+function formatCssVariables(result: HarmonyResult): string {
+  return result.colours
+    .map((colour, index) => `--harmony-${index + 1}: ${colour};`)
+    .join("\n");
+}

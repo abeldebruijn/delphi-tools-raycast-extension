@@ -363,6 +363,25 @@ function ContrastDetail({
     });
   }
 
+  async function swapColours() {
+    setIsFixing(true);
+
+    try {
+      const nextResult = await runContrast(displayResult.bg, displayResult.fg);
+
+      setDisplayResult(nextResult);
+      onResultChange?.(nextResult);
+    } catch (error) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Could not swap colours",
+        message: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setIsFixing(false);
+    }
+  }
+
   async function fixToMinimumRatio(minimumRatio: number) {
     const fixedForeground = getForegroundForRatio(
       displayResult.fg,
@@ -418,6 +437,17 @@ function ContrastDetail({
             icon={Icon.Clipboard}
             title="Copy Contrast Result"
             onAction={copyResult}
+          />
+          <Action.CopyToClipboard
+            title="Copy Foreground"
+            content={displayResult.fg}
+            shortcut={{ modifiers: ["cmd"], key: "f" }}
+          />
+          <Action
+            icon={Icon.Switch}
+            title="Flip Colours"
+            shortcut={{ modifiers: ["cmd"], key: "s" }}
+            onAction={swapColours}
           />
         </ActionPanel>
       }

@@ -15,7 +15,6 @@ Sources for native/core comparison: [Raycast Manual](https://manual.raycast.com/
 | [crop](./delphitools/crop.md)                       | Moderate           | Moderate     | ✗       | Not started |
 | [favicon](./delphitools/favicon.md)                 | Moderate           | Moderate     | ✗       | Not started |
 | [font-info](./delphitools/font-info.md)             | Moderate           | Moderate     | ✗       | Not started |
-| [harmony](./delphitools/harmony.md)                 | Easy               | Easy         | ✗       | Not started |
 | [impose](./delphitools/impose.md)                   | Hard               | Moderate     | ✗       | Not started |
 | [line-height](./delphitools/line-height.md)         | Easy               | Easy         | ✗       | Not started |
 | [matte](./delphitools/matte.md)                     | Moderate           | Moderate     | ✗       | Not started |
@@ -38,12 +37,13 @@ Sources for native/core comparison: [Raycast Manual](https://manual.raycast.com/
 
 ## Implemented
 
-| Tool                                  | Native? | Progress                                                                                          |
-| ------------------------------------- | ------- | ------------------------------------------------------------------------------------------------- |
-| [decode](./delphitools/decode.md)     | ✗       | Implemented as a clipboard/selection-first Command with base64 and URL support                    |
-| [encode](./delphitools/encode.md)     | ✗       | Implemented as a clipboard/selection-first Command with base64 and URL support                    |
-| [hash](./delphitools/hash.md)         | ✗       | Implemented as a clipboard/selection-first Command with md5, sha1, sha256, and sha512 support     |
+| Tool                                  | Native? | Progress                                                                                                                                                                                                                                                                             |
+| ------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [decode](./delphitools/decode.md)     | ✗       | Implemented as a clipboard/selection-first Command with base64 and URL support                                                                                                                                                                                                       |
+| [encode](./delphitools/encode.md)     | ✗       | Implemented as a clipboard/selection-first Command with base64 and URL support                                                                                                                                                                                                       |
+| [hash](./delphitools/hash.md)         | ✗       | Implemented as a clipboard/selection-first Command with md5, sha1, sha256, and sha512 support                                                                                                                                                                                        |
 | [contrast](./delphitools/contrast.md) | ✗       | Implemented as a live foreground/background colour Form; accepts hex, CSS names, rgb(), and hsl(). Could add an external service to render some text on top of background as an image. The url would be `https://tools.rmv.fyi/tools/contrast-checker/image-preview?fg=<fg>&bg=<bg>` |
+| [harmony](./delphitools/harmony.md)   | ✗       | Implemented as a live base-colour Form with all 12 harmony-genny types, copy actions, and a local preview image route                                                                                                                                                                |
 
 ## Not planned (already in Raycast core)
 

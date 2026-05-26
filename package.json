@@ -154,6 +154,76 @@
           "required": false
         }
       ]
+    },
+    {
+      "mode": "view",
+      "name": "harmony",
+      "title": "Generate Colour Harmony",
+      "description": "Generate colour harmonies from a base colour",
+      "arguments": [
+        {
+          "name": "colour",
+          "placeholder": "Base Colour",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "harmonyType",
+          "placeholder": "Harmony Type",
+          "type": "dropdown",
+          "required": false,
+          "data": [
+            {
+              "title": "Complementary",
+              "value": "complementary"
+            },
+            {
+              "title": "Analogous",
+              "value": "analogous"
+            },
+            {
+              "title": "Triadic",
+              "value": "triadic"
+            },
+            {
+              "title": "Split-Complementary",
+              "value": "split-complementary"
+            },
+            {
+              "title": "Tetradic (Square)",
+              "value": "tetradic"
+            },
+            {
+              "title": "Monochromatic",
+              "value": "monochromatic"
+            },
+            {
+              "title": "Double Complementary",
+              "value": "double-complementary"
+            },
+            {
+              "title": "Compound",
+              "value": "compound"
+            },
+            {
+              "title": "Pentadic",
+              "value": "pentadic"
+            },
+            {
+              "title": "Analogous Accent",
+              "value": "analogous-accent"
+            },
+            {
+              "title": "Golden Ratio",
+              "value": "golden"
+            },
+            {
+              "title": "Near Complementary",
+              "value": "near-complementary"
+            }
+          ]
+        }
+      ]
     }
   ],
   "title": "delphi-tools-raycast-extension",
