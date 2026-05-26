@@ -10,6 +10,7 @@ import {
   Toast,
 } from "@raycast/api";
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import { promisify } from "node:util";
 import { useEffect, useRef, useState } from "react";
 
@@ -20,7 +21,7 @@ import {
 
 const execFileAsync = promisify(execFile);
 
-type HashAlgorithm = "md5" | "sha256" | "sha512";
+type HashAlgorithm = "md5" | "sha1" | "sha256" | "sha512";
 
 type FormValues = {
   algorithm: HashAlgorithm;
@@ -201,6 +202,12 @@ function HashForm({
           />
           <Action
             icon={Icon.Clipboard}
+            title="Copy as SHA-1"
+            shortcut={{ modifiers: ["cmd", "shift"], key: "1" }}
+            onAction={() => copyAsHash("sha1")}
+          />
+          <Action
+            icon={Icon.Clipboard}
             title="Copy as SHA-256"
             shortcut={{ modifiers: ["cmd", "shift"], key: "2" }}
             onAction={() => copyAsHash("sha256")}
@@ -226,6 +233,7 @@ function HashForm({
         }
       >
         <Form.Dropdown.Item title="MD5" value="md5" />
+        <Form.Dropdown.Item title="SHA-1" value="sha1" />
         <Form.Dropdown.Item title="SHA-256" value="sha256" />
         <Form.Dropdown.Item title="SHA-512" value="sha512" />
       </Form.Dropdown>
@@ -265,6 +273,10 @@ async function runHash(
   algorithm: HashAlgorithm,
   input: string,
 ): Promise<string> {
+  if (algorithm === "sha1") {
+    return createHash("sha1").update(input).digest("hex");
+  }
+
   const { stdout } = await execFileAsync("delphitools", [
     "hash",
     "--quiet",
@@ -276,7 +288,7 @@ async function runHash(
 }
 
 function getInitialAlgorithm(algorithm: string | undefined): HashAlgorithm {
-  if (algorithm === "md5" || algorithm === "sha512") {
+  if (algorithm === "md5" || algorithm === "sha1" || algorithm === "sha512") {
     return algorithm;
   }
 
@@ -295,6 +307,8 @@ function getAlgorithmLabel(algorithm: HashAlgorithm): string {
   switch (algorithm) {
     case "md5":
       return "MD5";
+    case "sha1":
+      return "SHA-1";
     case "sha512":
       return "SHA-512";
     case "sha256":

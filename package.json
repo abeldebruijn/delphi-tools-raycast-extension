@@ -101,7 +101,7 @@
       "mode": "view",
       "name": "hash",
       "title": "Hash Text",
-      "description": "Hash text with MD5, SHA-256, or SHA-512",
+      "description": "Hash text with MD5, SHA-1, SHA-256, or SHA-512",
       "arguments": [
         {
           "name": "text",
@@ -118,6 +118,10 @@
             {
               "title": "MD5",
               "value": "md5"
+            },
+            {
+              "title": "SHA-1",
+              "value": "sha1"
             },
             {
               "title": "SHA-256",
