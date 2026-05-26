@@ -134,6 +134,26 @@
           ]
         }
       ]
+    },
+    {
+      "mode": "view",
+      "name": "contrast",
+      "title": "Check Contrast",
+      "description": "Check WCAG contrast ratio between foreground and background colours",
+      "arguments": [
+        {
+          "name": "bg",
+          "placeholder": "Background",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "fg",
+          "placeholder": "Foreground",
+          "type": "text",
+          "required": false
+        }
+      ]
     }
   ],
   "title": "delphi-tools-raycast-extension",

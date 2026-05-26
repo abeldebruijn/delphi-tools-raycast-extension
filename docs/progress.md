@@ -11,7 +11,6 @@ Sources for native/core comparison: [Raycast Manual](https://manual.raycast.com/
 | [barcode](./delphitools/barcode.md)                 | Moderate           | Moderate     | ✗       | Not started |
 | [clip](./delphitools/clip.md)                       | Moderate           | Moderate     | ✗       | Not started |
 | [colorblind](./delphitools/colorblind.md)           | Hard               | Moderate     | ✗       | Not started |
-| [contrast](./delphitools/contrast.md)               | Easy               | Easy         | ✗       | Not started |
 | [convert](./delphitools/convert.md)                 | Moderate           | Moderate     | ✗       | Not started |
 | [crop](./delphitools/crop.md)                       | Moderate           | Moderate     | ✗       | Not started |
 | [favicon](./delphitools/favicon.md)                 | Moderate           | Moderate     | ✗       | Not started |
@@ -39,11 +38,12 @@ Sources for native/core comparison: [Raycast Manual](https://manual.raycast.com/
 
 ## Implemented
 
-| Tool                              | Native? | Progress                                                                                |
-| --------------------------------- | ------- | --------------------------------------------------------------------------------------- |
-| [decode](./delphitools/decode.md) | ✗       | Implemented as a clipboard/selection-first Command with base64 and URL support          |
-| [encode](./delphitools/encode.md) | ✗       | Implemented as a clipboard/selection-first Command with base64 and URL support          |
-| [hash](./delphitools/hash.md)     | ✗       | Implemented as a clipboard/selection-first Command with md5, sha256, and sha512 support |
+| Tool                                  | Native? | Progress                                                                                          |
+| ------------------------------------- | ------- | ------------------------------------------------------------------------------------------------- |
+| [decode](./delphitools/decode.md)     | ✗       | Implemented as a clipboard/selection-first Command with base64 and URL support                    |
+| [encode](./delphitools/encode.md)     | ✗       | Implemented as a clipboard/selection-first Command with base64 and URL support                    |
+| [hash](./delphitools/hash.md)         | ✗       | Implemented as a clipboard/selection-first Command with md5, sha1, sha256, and sha512 support     |
+| [contrast](./delphitools/contrast.md) | ✗       | Implemented as a live foreground/background colour Form; accepts hex, CSS names, rgb(), and hsl(). Could add an external service to render some text on top of background as an image. The url would be `https://tools.rmv.fyi/tools/contrast-checker/image-preview?fg=<fg>&bg=<bg>` |
 
 ## Not planned (already in Raycast core)
 
