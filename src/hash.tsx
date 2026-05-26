@@ -1,3 +1,4 @@
+import type { LaunchProps } from "@raycast/api";
 import {
   Action,
   ActionPanel,
@@ -19,27 +20,31 @@ import {
 
 const execFileAsync = promisify(execFile);
 
-type CodecOperation = "encode" | "decode";
-type Encoding = "base64" | "url";
+type HashAlgorithm = "md5" | "sha256" | "sha512";
 
 type FormValues = {
-  encoding: Encoding;
+  algorithm: HashAlgorithm;
   input: string;
 };
 
-type TextCodecCommandProps = {
-  operation: CodecOperation;
-  initialInput?: string;
-  initialEncoding?: Encoding;
-};
+export default function Command(
+  props: LaunchProps<{ arguments: Arguments.Hash }>,
+) {
+  return (
+    <HashCommand
+      initialInput={props.arguments.text}
+      initialAlgorithm={getInitialAlgorithm(props.arguments.algorithm)}
+    />
+  );
+}
 
-export function TextCodecCommand({
-  operation,
+function HashCommand({
   initialInput = "",
-  initialEncoding = "base64",
-}: TextCodecCommandProps) {
-  const [currentOperation, setCurrentOperation] =
-    useState<CodecOperation>(operation);
+  initialAlgorithm = "sha256",
+}: {
+  initialInput?: string;
+  initialAlgorithm?: HashAlgorithm;
+}) {
   const [isDelphitoolsInstalled, setIsDelphitoolsInstalled] =
     useState<boolean>();
 
@@ -58,48 +63,24 @@ export function TextCodecCommand({
   }
 
   return (
-    <CodecForm
-      initialInput={initialInput}
-      initialEncoding={initialEncoding}
-      operation={currentOperation}
-      onOperationChange={setCurrentOperation}
-    />
+    <HashForm initialInput={initialInput} initialAlgorithm={initialAlgorithm} />
   );
 }
 
-async function getInitialInput(): Promise<string> {
-  try {
-    const selectedText = await getSelectedText();
-
-    if (selectedText.trim()) {
-      return selectedText;
-    }
-  } catch {
-    // Selection is optional; clipboard is the fallback source.
-  }
-
-  return (await Clipboard.readText()) ?? "";
-}
-
-function CodecForm({
+function HashForm({
   initialInput,
-  initialEncoding,
-  operation,
-  onOperationChange,
+  initialAlgorithm,
 }: {
   initialInput: string;
-  initialEncoding: Encoding;
-  operation: CodecOperation;
-  onOperationChange: (operation: CodecOperation) => void;
+  initialAlgorithm: HashAlgorithm;
 }) {
   const [values, setValues] = useState<FormValues>({
-    encoding: initialEncoding,
+    algorithm: initialAlgorithm,
     input: initialInput,
   });
   const [output, setOutput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const lastToastErrorRef = useRef("");
-  const resultTitle = operation === "encode" ? "Encoded" : "Decoded";
   const resultText = getResultText(output, isProcessing);
   const canCopy = Boolean(output);
 
@@ -138,23 +119,19 @@ function CodecForm({
 
     const timeout = setTimeout(async () => {
       try {
-        const nextOutput = await runTextCodec(
-          operation,
-          values.encoding,
-          values.input,
-        );
+        const nextOutput = await runHash(values.algorithm, values.input);
 
         setOutput(nextOutput);
         lastToastErrorRef.current = "";
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        const toastErrorKey = `${operation}:${values.encoding}:${values.input}:${message}`;
+        const toastErrorKey = `${values.algorithm}:${values.input}:${message}`;
 
         if (lastToastErrorRef.current !== toastErrorKey) {
           lastToastErrorRef.current = toastErrorKey;
           await showToast({
             style: Toast.Style.Failure,
-            title: `Could not ${operation} ${getEncodingLabel(values.encoding)}`,
+            title: `Could not hash with ${getAlgorithmLabel(values.algorithm)}`,
             message,
           });
         }
@@ -166,7 +143,7 @@ function CodecForm({
     return () => {
       clearTimeout(timeout);
     };
-  }, [operation, values.encoding, values.input]);
+  }, [values.algorithm, values.input]);
 
   async function copyResult() {
     if (!canCopy) {
@@ -176,42 +153,30 @@ function CodecForm({
     await Clipboard.copy(output);
     await showToast({
       style: Toast.Style.Success,
-      title: "Copied Result",
+      title: "Copied Hash",
     });
   }
 
-  async function copyAsEncoding(encoding: Encoding) {
+  async function copyAsHash(algorithm: HashAlgorithm) {
     if (!values.input.trim()) {
       return;
     }
 
     try {
-      const encoded = await runTextCodec("encode", encoding, values.input);
+      const hash = await runHash(algorithm, values.input);
 
-      await Clipboard.copy(encoded);
+      await Clipboard.copy(hash);
       await showToast({
         style: Toast.Style.Success,
-        title: `Copied ${getEncodingLabel(encoding)} Encoding`,
+        title: `Copied ${getAlgorithmLabel(algorithm)} Hash`,
       });
     } catch (error) {
       await showToast({
         style: Toast.Style.Failure,
-        title: `Could not copy ${getEncodingLabel(encoding)} encoding`,
+        title: `Could not copy ${getAlgorithmLabel(algorithm)} hash`,
         message: error instanceof Error ? error.message : String(error),
       });
     }
-  }
-
-  function swapDirection() {
-    const nextOperation = operation === "encode" ? "decode" : "encode";
-
-    onOperationChange(nextOperation);
-    setValues((currentValues) => ({
-      ...currentValues,
-      input: output || currentValues.input,
-    }));
-    setOutput("");
-    lastToastErrorRef.current = "";
   }
 
   return (
@@ -220,14 +185,8 @@ function CodecForm({
         <ActionPanel>
           <Action
             icon={Icon.Clipboard}
-            title={`Copy ${resultTitle}`}
+            title="Copy Hash"
             onAction={copyResult}
-          />
-          <Action
-            icon={Icon.Switch}
-            title={`Switch to ${operation === "encode" ? "Decode" : "Encode"}`}
-            shortcut={{ modifiers: ["cmd"], key: "s" }}
-            onAction={swapDirection}
           />
           <Action.CopyToClipboard
             title="Copy Input"
@@ -236,48 +195,44 @@ function CodecForm({
           />
           <Action
             icon={Icon.Clipboard}
-            title="Copy as Base64 Encoding"
-            shortcut={{ modifiers: ["cmd", "shift"], key: "b" }}
-            onAction={() => copyAsEncoding("base64")}
+            title="Copy as MD5"
+            shortcut={{ modifiers: ["cmd", "shift"], key: "m" }}
+            onAction={() => copyAsHash("md5")}
           />
           <Action
             icon={Icon.Clipboard}
-            title="Copy as URL Encoding"
-            shortcut={{ modifiers: ["cmd", "shift"], key: "u" }}
-            onAction={() => copyAsEncoding("url")}
+            title="Copy as SHA-256"
+            shortcut={{ modifiers: ["cmd", "shift"], key: "2" }}
+            onAction={() => copyAsHash("sha256")}
+          />
+          <Action
+            icon={Icon.Clipboard}
+            title="Copy as SHA-512"
+            shortcut={{ modifiers: ["cmd", "shift"], key: "5" }}
+            onAction={() => copyAsHash("sha512")}
           />
         </ActionPanel>
       }
     >
       <Form.Dropdown
-        id="operation"
-        title="Mode"
-        value={operation}
-        onChange={(nextOperation) =>
-          onOperationChange(nextOperation as CodecOperation)
-        }
-      >
-        <Form.Dropdown.Item title="Encode" value="encode" />
-        <Form.Dropdown.Item title="Decode" value="decode" />
-      </Form.Dropdown>
-      <Form.Dropdown
-        id="encoding"
-        title="Encoding"
-        value={values.encoding}
-        onChange={(encoding) =>
+        id="algorithm"
+        title="Algorithm"
+        value={values.algorithm}
+        onChange={(algorithm) =>
           setValues((currentValues) => ({
             ...currentValues,
-            encoding: encoding as Encoding,
+            algorithm: algorithm as HashAlgorithm,
           }))
         }
       >
-        <Form.Dropdown.Item title="Base64" value="base64" />
-        <Form.Dropdown.Item title="URL" value="url" />
+        <Form.Dropdown.Item title="MD5" value="md5" />
+        <Form.Dropdown.Item title="SHA-256" value="sha256" />
+        <Form.Dropdown.Item title="SHA-512" value="sha512" />
       </Form.Dropdown>
       <Form.TextArea
         id="input"
         title="Input"
-        placeholder={`Text to ${operation}`}
+        placeholder="Text to hash"
         value={values.input}
         onChange={(input) =>
           setValues((currentValues) => ({
@@ -287,24 +242,45 @@ function CodecForm({
         }
       />
 
-      <Form.Description title={resultTitle} text={resultText} />
+      <Form.Description title="Hash" text={resultText} />
     </Form>
   );
 }
 
-async function runTextCodec(
-  operation: CodecOperation,
-  encoding: Encoding,
+async function getInitialInput(): Promise<string> {
+  try {
+    const selectedText = await getSelectedText();
+
+    if (selectedText.trim()) {
+      return selectedText;
+    }
+  } catch {
+    // Selection is optional; clipboard is the fallback source.
+  }
+
+  return (await Clipboard.readText()) ?? "";
+}
+
+async function runHash(
+  algorithm: HashAlgorithm,
   input: string,
 ): Promise<string> {
   const { stdout } = await execFileAsync("delphitools", [
-    operation,
+    "hash",
     "--quiet",
-    encoding,
+    algorithm,
     input,
   ]);
 
   return stdout.trimEnd();
+}
+
+function getInitialAlgorithm(algorithm: string | undefined): HashAlgorithm {
+  if (algorithm === "md5" || algorithm === "sha512") {
+    return algorithm;
+  }
+
+  return "sha256";
 }
 
 function getResultText(output: string, isProcessing: boolean): string {
@@ -315,6 +291,13 @@ function getResultText(output: string, isProcessing: boolean): string {
   return output || " ";
 }
 
-function getEncodingLabel(encoding: Encoding): string {
-  return encoding === "base64" ? "Base64" : "URL";
+function getAlgorithmLabel(algorithm: HashAlgorithm): string {
+  switch (algorithm) {
+    case "md5":
+      return "MD5";
+    case "sha512":
+      return "SHA-512";
+    case "sha256":
+      return "SHA-256";
+  }
 }

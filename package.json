@@ -41,13 +41,95 @@
       "mode": "view",
       "name": "encode",
       "title": "Encode Text",
-      "description": "Encode text as base64 or URL encoding"
+      "description": "Encode text as base64 or URL encoding",
+      "arguments": [
+        {
+          "name": "text",
+          "placeholder": "Text",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "encoding",
+          "placeholder": "Encoding",
+          "type": "dropdown",
+          "required": false,
+          "data": [
+            {
+              "title": "Base64",
+              "value": "base64"
+            },
+            {
+              "title": "URL",
+              "value": "url"
+            }
+          ]
+        }
+      ]
     },
     {
       "mode": "view",
       "name": "decode",
       "title": "Decode Text",
-      "description": "Decode base64 or URL-encoded text"
+      "description": "Decode base64 or URL-encoded text",
+      "arguments": [
+        {
+          "name": "text",
+          "placeholder": "Text",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "encoding",
+          "placeholder": "Encoding",
+          "type": "dropdown",
+          "required": false,
+          "data": [
+            {
+              "title": "Base64",
+              "value": "base64"
+            },
+            {
+              "title": "URL",
+              "value": "url"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "view",
+      "name": "hash",
+      "title": "Hash Text",
+      "description": "Hash text with MD5, SHA-256, or SHA-512",
+      "arguments": [
+        {
+          "name": "text",
+          "placeholder": "Text",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "algorithm",
+          "placeholder": "Algorithm",
+          "type": "dropdown",
+          "required": false,
+          "data": [
+            {
+              "title": "MD5",
+              "value": "md5"
+            },
+            {
+              "title": "SHA-256",
+              "value": "sha256"
+            },
+            {
+              "title": "SHA-512",
+              "value": "sha512"
+            }
+          ]
+        }
+      ]
     }
   ],
   "title": "delphi-tools-raycast-extension",
