@@ -8,35 +8,42 @@ This project is in heavy development. Current implementation status is tracked i
 
 Implemented commands:
 
-- Check delphitools Install
-- delphitools
+- Check Delphitools Install
+- Delphitools
 - Encode Text
 - Decode Text
 - Hash Text
 - Check Contrast
 - Generate Colour Harmony
+- Simulate Colour Blindness
+- Simulate Colour Blindness (Image)
+- Generate Tailwind Shades
+- Line Height
+- Paper Sizes
+- Transliterate to Shavian
 
 The extension is a local-first Raycast-native wrapper over the `delphitools` CLI. Core tool execution is intended to run locally through the CLI rather than through hosted processing.
 
-## Image previews
+## Images
 
-Some commands render preview images. The preview image routes currently come from [abeldebruijn/delphitools `codex/add-urltoimage-routes`](https://github.com/abeldebruijn/delphitools/tree/codex/add-urltoimage-routes), which is a fork of [1612elphi/delphitools](https://github.com/1612elphi/delphitools).
+The extension uses both SVG and PNG images:
 
-The extension fetches these previews as images because Raycast extensions do not allow arbitrary HTML styling. Rendering styled previews in the forked web app and loading them as images lets the Raycast command show richer visual output while staying within Raycast's extension UI constraints.
+- Command icons in `assets/` are SVG files, matching the existing beige-background delphitools icon style.
+- The extension icon remains `assets/extension-icon.png`.
+- Generated previews are temporary local image files referenced from Raycast markdown with `![alt](path)`.
 
-At the moment, this Raycast extension fetches those preview images from `http://localhost:3000`:
+Preview formats depend on the command:
 
-- Contrast preview: `http://localhost:3000/contrast-checker/image`
-- Harmony preview: `http://localhost:3000/harmony-genny/image`
+- Colour swatches and colour-blindness image output use PNG files.
+- Contrast text previews and paper-size comparisons use SVG files.
 
-This is subject to change as the project develops.
+These previews are generated locally by the extension or by the local `delphitools` CLI. They do not require a separate localhost web preview server.
 
 ## Requirements
 
 - Raycast
 - Node.js and npm
 - Rust and Cargo, for installing the `delphitools` CLI
-- The forked delphitools repo running locally if you want image previews
 
 ## Run the extension
 
@@ -59,18 +66,6 @@ cargo install delphitools-cli
 ```
 
 You can check whether the CLI is available with the `Check delphitools Install` command in Raycast.
-
-## Run local image preview routes
-
-Clone the fork that currently hosts the preview image routes:
-
-```sh
-git clone https://github.com/abeldebruijn/delphitools.git
-cd delphitools
-git checkout codex/add-urltoimage-routes
-```
-
-Then run that repo's web app or server on `localhost:3000` using its own instructions.
 
 ## Scripts
 
