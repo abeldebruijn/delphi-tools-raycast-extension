@@ -18,6 +18,7 @@ import {
   DelphitoolsInstallStatusView,
   getDelphitoolsInstallStatus,
 } from "./delphitools-install";
+import { createTempTextSwatchPng } from "./swatch-png";
 
 const execFileAsync = promisify(execFile);
 
@@ -38,6 +39,11 @@ type ContrastResult = {
 
 const DEFAULT_BG = "#1a1a2e";
 const DEFAULT_FG = "#eaeaea";
+const SWATCH_NAMESPACE = "contrast";
+
+type ContrastPreview = {
+  path: string;
+};
 
 export default function Command(
   props: LaunchProps<{ arguments: Arguments.Contrast }>,
@@ -349,11 +355,47 @@ function ContrastDetail({
   onResultChange?: (result: ContrastResult) => void;
 }) {
   const [displayResult, setDisplayResult] = useState(result);
+  const [preview, setPreview] = useState<ContrastPreview>();
+  const [previewError, setPreviewError] = useState("");
   const [isFixing, setIsFixing] = useState(false);
 
   useEffect(() => {
     setDisplayResult(result);
   }, [result]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function createPreview() {
+      try {
+        const path = await createTempTextSwatchPng({
+          backgroundColour: displayResult.bg,
+          foregroundColour: displayResult.fg,
+          namespace: SWATCH_NAMESPACE,
+        });
+
+        if (!isMounted) {
+          return;
+        }
+
+        setPreview({ path });
+        setPreviewError("");
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setPreview(undefined);
+        setPreviewError(error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    createPreview();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [displayResult.bg, displayResult.fg]);
 
   async function copyResult() {
     await Clipboard.copy(formatResult(displayResult));
@@ -417,8 +459,8 @@ function ContrastDetail({
 
   return (
     <Detail
-      isLoading={isFixing}
-      markdown={getDetailMarkdown(displayResult)}
+      isLoading={isFixing || (!preview && !previewError)}
+      markdown={getDetailMarkdown(displayResult, preview, previewError)}
       actions={
         <ActionPanel>
           <Action
@@ -443,6 +485,13 @@ function ContrastDetail({
             content={displayResult.fg}
             shortcut={{ modifiers: ["cmd"], key: "f" }}
           />
+          {preview ? (
+            <Action.CopyToClipboard
+              title="Copy Preview Path"
+              content={preview.path}
+              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+            />
+          ) : null}
           <Action
             icon={Icon.Switch}
             title="Flip Colours"
@@ -517,13 +566,17 @@ function formatPass(value: boolean): string {
   return value ? "PASS" : "FAIL";
 }
 
-function getDetailMarkdown(result: ContrastResult): string {
+function getDetailMarkdown(
+  result: ContrastResult,
+  preview: ContrastPreview | undefined,
+  previewError: string,
+): string {
   const fixHintText = getFixHintText(result);
   const hintSection = fixHintText ? `\n## Hint\n${fixHintText}\n` : "";
+  const previewSection = getPreviewMarkdown(preview, previewError);
 
   return [
-    `![Contrast preview](${getContrastPreviewImageUrl(result)})`,
-    "",
+    previewSection,
     `# ${result.ratio.toFixed(2)}:1`,
     `Contrast Ratio: ${getRatioLabel(result.ratio)}`,
     hintSection,
@@ -553,13 +606,21 @@ function getDetailMarkdown(result: ContrastResult): string {
     .join("\n");
 }
 
-function getContrastPreviewImageUrl(result: ContrastResult): string {
-  const params = new URLSearchParams({
-    fg: result.fg,
-    bg: result.bg,
-  });
+function getPreviewMarkdown(
+  preview: ContrastPreview | undefined,
+  previewError: string,
+): string {
+  if (previewError) {
+    return ["Could not generate contrast preview.", "", previewError, ""].join(
+      "\n",
+    );
+  }
 
-  return `http://localhost:3000/contrast-checker/image?${params.toString()}`;
+  if (!preview) {
+    return ["Generating contrast preview...", ""].join("\n");
+  }
+
+  return [`![Contrast preview](${preview.path})`, ""].join("\n");
 }
 
 function getFixHintText(result: ContrastResult | undefined): string {
