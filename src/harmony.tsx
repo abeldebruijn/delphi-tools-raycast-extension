@@ -18,6 +18,7 @@ import {
   DelphitoolsInstallStatusView,
   getDelphitoolsInstallStatus,
 } from "./delphitools-install";
+import { createTempSwatchPng } from "./swatch-png";
 
 const execFileAsync = promisify(execFile);
 
@@ -53,8 +54,13 @@ type HarmonyResult = {
   colours: string[];
 };
 
+type HarmonySwatchPreview = {
+  paths: string[];
+};
+
 const DEFAULT_COLOUR = "#3b82f6";
 const DEFAULT_HARMONY_TYPE: HarmonyType = "complementary";
+const SWATCH_NAMESPACE = "harmony";
 
 const HARMONY_TYPES: Array<{ label: string; value: HarmonyType }> = [
   { label: "Complementary", value: "complementary" },
@@ -306,6 +312,46 @@ function HarmonyForm({
 }
 
 function HarmonyDetail({ result }: { result: HarmonyResult }) {
+  const [swatchPreview, setSwatchPreview] = useState<HarmonySwatchPreview>();
+  const [swatchError, setSwatchError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function createPreview() {
+      try {
+        const paths = await Promise.all(
+          result.colours.map((colour) =>
+            createTempSwatchPng({
+              colour,
+              namespace: SWATCH_NAMESPACE,
+            }),
+          ),
+        );
+
+        if (!isMounted) {
+          return;
+        }
+
+        setSwatchPreview({ paths });
+        setSwatchError("");
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setSwatchPreview(undefined);
+        setSwatchError(error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    createPreview();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [result.colours]);
+
   async function copyColours() {
     await Clipboard.copy(result.colours.join("\n"));
     await showToast({
@@ -324,7 +370,8 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
 
   return (
     <Detail
-      markdown={getDetailMarkdown(result)}
+      isLoading={!swatchPreview && !swatchError}
+      markdown={getDetailMarkdown(result, swatchPreview, swatchError)}
       actions={
         <ActionPanel>
           <Action
@@ -350,6 +397,15 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
               }
             />
           ))}
+          {swatchPreview
+            ? swatchPreview.paths.map((filePath, index) => (
+                <Action.CopyToClipboard
+                  key={filePath}
+                  title={`Copy Swatch ${index + 1} Path`}
+                  content={filePath}
+                />
+              ))
+            : null}
         </ActionPanel>
       }
       metadata={
@@ -485,27 +541,45 @@ function getResultText(
   return result?.colours.join(", ") || " ";
 }
 
-function getDetailMarkdown(result: HarmonyResult): string {
+function getDetailMarkdown(
+  result: HarmonyResult,
+  swatchPreview: HarmonySwatchPreview | undefined,
+  swatchError: string,
+): string {
+  if (swatchError) {
+    return [
+      `# ${getHarmonyTypeLabel(result.harmonyType)}`,
+      "",
+      "Could not generate swatch preview.",
+      "",
+      swatchError,
+      "",
+      result.colours.map((colour) => `- \`${colour}\``).join("\n"),
+    ].join("\n");
+  }
+
+  if (!swatchPreview) {
+    return [
+      `# ${getHarmonyTypeLabel(result.harmonyType)}`,
+      "",
+      "Generating swatch preview...",
+    ].join("\n");
+  }
+
   return [
-    `![Harmony preview](${getHarmonyPreviewImageUrl(result)})`,
-    "",
     `# ${getHarmonyTypeLabel(result.harmonyType)}`,
     "",
-    result.colours.map((colour) => `- \`${colour}\``).join("\n"),
+    getSwatchTableMarkdown(result.colours, swatchPreview.paths),
   ].join("\n");
 }
 
-function getHarmonyPreviewImageUrl(result: HarmonyResult): string {
-  const params = new URLSearchParams({
-    base: result.colours[0] ?? result.colour,
-    type: getPreviewHarmonyType(result.harmonyType),
-  });
-
-  return `http://localhost:3000/harmony-genny/image?${params.toString()}`;
-}
-
-function getPreviewHarmonyType(harmonyType: HarmonyType): string {
-  return harmonyType;
+function getSwatchTableMarkdown(colours: string[], paths: string[]): string {
+  return [
+    `| ${colours.map((_, index) => `Colour ${index + 1}`).join(" | ")} |`,
+    `| ${colours.map(() => "---").join(" | ")} |`,
+    `| ${paths.map((filePath, index) => `![Colour ${index + 1} swatch](${filePath})`).join(" | ")} |`,
+    `| ${colours.map((colour) => `\`${colour}\``).join(" | ")} |`,
+  ].join("\n");
 }
 
 function getLocalHarmony(baseHex: string, harmonyType: HarmonyType): string[] {

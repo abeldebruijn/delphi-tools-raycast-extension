@@ -18,6 +18,7 @@ import {
   DelphitoolsInstallStatusView,
   getDelphitoolsInstallStatus,
 } from "./delphitools-install";
+import { createTempSwatchPng, normaliseHexColour } from "./swatch-png";
 
 const execFileAsync = promisify(execFile);
 
@@ -43,8 +44,19 @@ type ColorBlindnessResult = {
   type: ColorBlindnessType;
 };
 
+type ColorBlindnessCliResult = {
+  colour: string;
+  simulatedColour: string;
+};
+
+type SwatchPreview = {
+  sourcePath: string;
+  simulatedPath: string;
+};
+
 const DEFAULT_COLOUR = "#e63946";
 const DEFAULT_TYPE: ColorBlindnessType = "normal";
+const SWATCH_NAMESPACE = "colorblind";
 
 const COLOR_BLINDNESS_TYPES: Array<{
   label: string;
@@ -154,14 +166,14 @@ function ColorBlindnessForm({
 
     const timeout = setTimeout(async () => {
       try {
-        const simulatedColour = await runColorBlindnessSimulation(
+        const nextResult = await runColorBlindnessSimulation(
           values.colour,
           values.type,
         );
 
         setResult({
-          colour: values.colour,
-          simulatedColour,
+          colour: nextResult.colour,
+          simulatedColour: nextResult.simulatedColour,
           type: values.type,
         });
         lastToastErrorRef.current = "";
@@ -201,16 +213,6 @@ function ColorBlindnessForm({
     });
   }
 
-  async function copyPreviewUrl() {
-    const previewUrl = getPreviewImageUrl(result ?? values);
-
-    await Clipboard.copy(previewUrl);
-    await showToast({
-      style: Toast.Style.Success,
-      title: "Copied Preview Image URL",
-    });
-  }
-
   return (
     <Form
       isLoading={isProcessing}
@@ -232,12 +234,6 @@ function ColorBlindnessForm({
             title="Copy Source Colour"
             content={values.colour}
             shortcut={{ modifiers: ["cmd"], key: "b" }}
-          />
-          <Action
-            icon={Icon.Link}
-            title="Copy Preview Image URL"
-            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-            onAction={copyPreviewUrl}
           />
         </ActionPanel>
       }
@@ -282,6 +278,42 @@ function ColorBlindnessForm({
 }
 
 function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
+  const [swatchPreview, setSwatchPreview] = useState<SwatchPreview>();
+  const [swatchError, setSwatchError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function createPreview() {
+      try {
+        const nextSwatchPreview = {
+          sourcePath: await createSwatchPng(result.colour),
+          simulatedPath: await createSwatchPng(result.simulatedColour),
+        };
+
+        if (!isMounted) {
+          return;
+        }
+
+        setSwatchPreview(nextSwatchPreview);
+        setSwatchError("");
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setSwatchPreview(undefined);
+        setSwatchError(error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    createPreview();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [result.colour, result.simulatedColour]);
+
   async function copySimulatedColour() {
     await Clipboard.copy(result.simulatedColour);
     await showToast({
@@ -292,7 +324,8 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
 
   return (
     <Detail
-      markdown={getDetailMarkdown(result)}
+      isLoading={!swatchPreview && !swatchError}
+      markdown={getDetailMarkdown(result, swatchPreview, swatchError)}
       actions={
         <ActionPanel>
           <Action
@@ -305,11 +338,13 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
             content={result.colour}
             shortcut={{ modifiers: ["cmd"], key: "b" }}
           />
-          <Action.CopyToClipboard
-            title="Copy Preview Image URL"
-            content={getPreviewImageUrl(result)}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-          />
+          {swatchPreview ? (
+            <Action.CopyToClipboard
+              title="Copy Simulated Swatch Path"
+              content={swatchPreview.simulatedPath}
+              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+            />
+          ) : null}
         </ActionPanel>
       }
       metadata={
@@ -354,7 +389,7 @@ async function getInitialColour(): Promise<string> {
 async function runColorBlindnessSimulation(
   colour: string,
   type: ColorBlindnessType,
-): Promise<string> {
+): Promise<ColorBlindnessCliResult> {
   const { stdout } = await execFileAsync("delphitools", [
     "colorblind",
     "--json",
@@ -367,19 +402,29 @@ async function runColorBlindnessSimulation(
   return parseColourOutput(stdout);
 }
 
-function parseColourOutput(stdout: string): string {
+function parseColourOutput(stdout: string): ColorBlindnessCliResult {
   const parsed = JSON.parse(stdout) as unknown;
 
   if (typeof parsed === "string") {
-    return parsed;
+    const colour = normaliseHexColour(parsed);
+
+    return {
+      colour,
+      simulatedColour: colour,
+    };
   }
 
   if (parsed && typeof parsed === "object") {
+    const output = parsed as Record<string, unknown>;
+
     for (const key of ["hex", "colour", "color", "result"]) {
-      const value = (parsed as Record<string, unknown>)[key];
+      const value = output[key];
 
       if (typeof value === "string") {
-        return value;
+        return {
+          colour: getOriginalHex(output) ?? normaliseHexColour(value),
+          simulatedColour: normaliseHexColour(value),
+        };
       }
     }
   }
@@ -416,32 +461,58 @@ function getResultText(
   return result?.simulatedColour || " ";
 }
 
-function getDetailMarkdown(result: ColorBlindnessResult): string {
+function getDetailMarkdown(
+  result: ColorBlindnessResult,
+  swatchPreview: SwatchPreview | undefined,
+  swatchError: string,
+): string {
+  if (swatchError) {
+    return [
+      `# ${getColorBlindnessTypeLabel(result.type)}`,
+      "",
+      "Could not generate swatch preview.",
+      "",
+      swatchError,
+      "",
+      `Source: \`${result.colour}\``,
+      "",
+      `Simulated: \`${result.simulatedColour}\``,
+    ].join("\n");
+  }
+
+  if (!swatchPreview) {
+    return [
+      `# ${getColorBlindnessTypeLabel(result.type)}`,
+      "",
+      "Generating swatch preview...",
+    ].join("\n");
+  }
+
   return [
-    `![Colour blindness preview](${getPreviewImageUrl(result)})`,
-    "",
     `# ${getColorBlindnessTypeLabel(result.type)}`,
     "",
-    `Source: \`${result.colour}\``,
-    "",
-    `Simulated: \`${result.simulatedColour}\``,
+    `| Original | ${getColorBlindnessTypeLabel(result.type)} |`,
+    "| --- | --- |",
+    `| ![Original swatch](${swatchPreview.sourcePath}) | ![Simulated swatch](${swatchPreview.simulatedPath}) |`,
+    `| \`${result.colour}\` | \`${result.simulatedColour}\` |`,
   ].join("\n");
 }
 
-function getPreviewImageUrl({
-  colour,
-  type,
-}: {
-  colour: string;
-  type: ColorBlindnessType;
-}): string {
-  const params = new URLSearchParams({
-    color: colour,
-  });
+function getOriginalHex(output: Record<string, unknown>): string | undefined {
+  for (const key of ["original_hex", "originalHex", "input"]) {
+    const value = output[key];
 
-  if (type !== "normal") {
-    params.set("type", type);
+    if (typeof value === "string") {
+      return normaliseHexColour(value);
+    }
   }
 
-  return `http://localhost:3000/colorblind-sim/image?${params.toString()}`;
+  return undefined;
+}
+
+async function createSwatchPng(colour: string): Promise<string> {
+  return createTempSwatchPng({
+    colour,
+    namespace: SWATCH_NAMESPACE,
+  });
 }
