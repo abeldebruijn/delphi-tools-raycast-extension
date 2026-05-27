@@ -25,6 +25,7 @@ const DEFAULT_TEXT_SWATCH_HEIGHT = 360;
 const PNG_SIGNATURE = Buffer.from([
   0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
 ]);
+const pendingSwatchWrites = new Map<string, Promise<void>>();
 
 export async function createTempSwatchPng({
   colour,
@@ -35,8 +36,7 @@ export async function createTempSwatchPng({
   const hex = normaliseHexColour(colour);
   const filePath = getTempSwatchPath({ hex, namespace, width, height });
 
-  await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, encodeSolidColourPng({ hex, width, height }));
+  await writeTempSwatch(filePath, encodeSolidColourPng({ hex, width, height }));
 
   return filePath;
 }
@@ -58,13 +58,31 @@ export async function createTempTextSwatchPng({
     height,
   });
 
-  await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(
+  await writeTempSwatch(
     filePath,
     encodeTextSwatchPng({ backgroundHex, foregroundHex, width, height }),
   );
 
   return filePath;
+}
+
+async function writeTempSwatch(filePath: string, buffer: Buffer): Promise<void> {
+  const previousWrite = pendingSwatchWrites.get(filePath) ?? Promise.resolve();
+
+  const currentWrite = previousWrite.catch(() => undefined).then(async () => {
+    await mkdir(path.dirname(filePath), { recursive: true });
+    await writeFile(filePath, buffer);
+  });
+
+  pendingSwatchWrites.set(filePath, currentWrite);
+
+  try {
+    await currentWrite;
+  } finally {
+    if (pendingSwatchWrites.get(filePath) === currentWrite) {
+      pendingSwatchWrites.delete(filePath);
+    }
+  }
 }
 
 export function normaliseHexColour(colour: string): string {
