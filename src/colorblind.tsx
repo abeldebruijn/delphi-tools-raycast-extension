@@ -240,12 +240,14 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
             onAction={copySimulatedColour}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title="Copy Source Color"
             content={result.colour}
             shortcut={{ modifiers: ["cmd"], key: "b" }}
           />
           {swatchPreview ? (
             <Action.CopyToClipboard
+              icon={Icon.Clipboard}
               title="Copy Simulated Swatch Path"
               content={swatchPreview.simulatedPath}
               shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}

@@ -307,11 +307,13 @@ function ContrastForm({
             onAction={copyResult}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title="Copy Foreground"
             content={values.fg}
             shortcut={{ modifiers: ["cmd"], key: "f" }}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title="Copy Background"
             content={values.bg}
             shortcut={{ modifiers: ["cmd"], key: "b" }}
@@ -484,12 +486,14 @@ function ContrastDetail({
             onAction={copyResult}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title="Copy Foreground"
             content={displayResult.fg}
             shortcut={{ modifiers: ["cmd"], key: "f" }}
           />
           {preview ? (
             <Action.CopyToClipboard
+              icon={Icon.Clipboard}
               title="Copy Preview Path"
               content={preview.path}
               shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}

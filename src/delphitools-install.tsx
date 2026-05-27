@@ -47,6 +47,7 @@ ${INSTALL_COMMAND}
         actions={
           <ActionPanel>
             <Action.CopyToClipboard
+              icon={Icon.Clipboard}
               title="Copy Install Command"
               content={INSTALL_COMMAND}
             />

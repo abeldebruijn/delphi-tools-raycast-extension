@@ -1,4 +1,3 @@
-/* eslint-disable @raycast/prefer-title-case */
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -164,10 +163,7 @@ function LineHeightList({ initialFontSize }: { initialFontSize: string }) {
   }
 
   return (
-    <List
-      isLoading={isLoading}
-      searchBarPlaceholder="Search ratios"
-    >
+    <List isLoading={isLoading} searchBarPlaceholder="Search ratios">
       <List.EmptyView
         title="No Line Heights"
         description="Change the font size and try again."
@@ -226,10 +222,12 @@ function LineHeightActions({
     <ActionPanel>
       <ActionPanel.Section>
         <Action.CopyToClipboard
+          icon={Icon.Clipboard}
           title="Copy Line Height"
           content={`${formatNumber(result.px)}px`}
         />
         <Action.CopyToClipboard
+          icon={Icon.Code}
           title="Copy CSS Declaration"
           content={formatCssDeclaration(result)}
           shortcut={{ modifiers: ["cmd"], key: "c" }}
@@ -266,7 +264,7 @@ function LineHeightActions({
             <Action
               key={recentFontSize}
               icon={Icon.Clock}
-              title={`Use ${recentFontSize} PX As Font Size`}
+              title={`Use ${recentFontSize}px as Font Size`}
               onAction={() => onFontSizeChange(recentFontSize)}
             />
           ))}

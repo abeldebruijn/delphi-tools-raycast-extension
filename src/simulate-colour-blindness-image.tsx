@@ -208,11 +208,13 @@ function SimulationDetail({ result }: { result: SimulationResult }) {
             onAction={copyImage}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title="Copy Simulated Image Path"
             content={result.outputPath}
             shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title="Copy Original Image Path"
             content={result.inputPath}
             shortcut={{ modifiers: ["cmd"], key: "b" }}

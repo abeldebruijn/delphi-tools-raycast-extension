@@ -269,6 +269,7 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
           {result.colours.map((colour, index) => (
             <Action.CopyToClipboard
               key={`${colour}-${index}`}
+              icon={Icon.Clipboard}
               title={`Copy Color ${index + 1}`}
               content={colour}
               shortcut={
@@ -282,6 +283,7 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
             ? swatchPreview.paths.map((filePath, index) => (
                 <Action.CopyToClipboard
                   key={filePath}
+                  icon={Icon.Clipboard}
                   title={`Copy Swatch ${index + 1} Path`}
                   content={filePath}
                 />

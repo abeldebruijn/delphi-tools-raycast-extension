@@ -371,11 +371,13 @@ function CompareDetail({
             onAction={copySummary}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title={`Copy ${left.name}`}
             content={formatDimensions(left)}
             shortcut={{ modifiers: ["cmd"], key: "1" }}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title={`Copy ${right.name}`}
             content={formatDimensions(right)}
             shortcut={{ modifiers: ["cmd"], key: "2" }}
