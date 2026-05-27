@@ -298,6 +298,27 @@
     },
     {
       "mode": "view",
+      "name": "barcode",
+      "title": "Generate Barcode",
+      "description": "Generate a barcode image from text",
+      "icon": "barcode-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "clip",
+      "title": "Trim Transparent Edges",
+      "description": "Trim transparent edges from PNG images",
+      "icon": "clip-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "convert",
+      "title": "Convert Images",
+      "description": "Convert images between formats with optional resize",
+      "icon": "convert-icon.svg"
+    },
+    {
+      "mode": "view",
       "name": "tailwind-shades",
       "title": "Generate Tailwind Shades",
       "description": "Generate Tailwind CSS colour shades from a base colour",

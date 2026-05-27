@@ -17,6 +17,9 @@ Implemented commands:
 - Generate Colour Harmony
 - Simulate Colour Blindness
 - Simulate Colour Blindness (Image)
+- Generate Barcode
+- Trim Transparent Edges
+- Convert Images
 - Generate Tailwind Shades
 - Line Height
 - Paper Sizes
