@@ -126,7 +126,7 @@ export function normaliseHexColour(colour: string): string {
   const match = /^#?([0-9a-fA-F]{6})$/.exec(trimmed);
 
   if (!match) {
-    throw new Error(`Expected a 6-digit hex colour, received: ${colour}`);
+    throw new Error(`Expected a 6-digit hex color, received: ${colour}`);
   }
 
   return `#${match[1].toLowerCase()}`;

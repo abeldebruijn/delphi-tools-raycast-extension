@@ -166,7 +166,6 @@ function LineHeightList({ initialFontSize }: { initialFontSize: string }) {
   return (
     <List
       isLoading={isLoading}
-      navigationTitle={`Line Height for ${fontSize}px`}
       searchBarPlaceholder="Search ratios"
     >
       <List.EmptyView

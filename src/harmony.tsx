@@ -126,7 +126,7 @@ function HarmonyResultView({
   useEffect(() => {
     if (!colour.trim()) {
       setResult(undefined);
-      setError("Base colour is required.");
+      setError("Base color is required.");
       setIsProcessing(false);
       return;
     }
@@ -237,7 +237,7 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
     await Clipboard.copy(result.colours.join("\n"));
     await showToast({
       style: Toast.Style.Success,
-      title: "Copied Harmony Colours",
+      title: "Copied Harmony Colors",
     });
   }
 
@@ -257,7 +257,7 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
         <ActionPanel>
           <Action
             icon={Icon.Clipboard}
-            title="Copy Harmony Colours"
+            title="Copy Harmony Colors"
             onAction={copyColours}
           />
           <Action
@@ -269,7 +269,7 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
           {result.colours.map((colour, index) => (
             <Action.CopyToClipboard
               key={`${colour}-${index}`}
-              title={`Copy Colour ${index + 1}`}
+              title={`Copy Color ${index + 1}`}
               content={colour}
               shortcut={
                 index < 9
@@ -309,7 +309,7 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
       metadata={
         <Detail.Metadata>
           <Detail.Metadata.Label
-            title="Base Colour"
+            title="Base Color"
             text={result.colours[0] ?? result.colour}
             icon={{
               source: Icon.Circle,
@@ -324,7 +324,7 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
           {result.colours.map((colour, index) => (
             <Detail.Metadata.Label
               key={`${colour}-${index}`}
-              title={`Colour ${index + 1}`}
+              title={`Color ${index + 1}`}
               text={colour}
               icon={{ source: Icon.Circle, tintColor: colour }}
             />
@@ -375,7 +375,7 @@ async function normaliseColour(colour: string): Promise<string> {
   const parsed = JSON.parse(stdout) as { hex?: unknown };
 
   if (typeof parsed.hex !== "string") {
-    throw new Error("Unexpected colour output from delphitools.");
+    throw new Error("Unexpected color output from delphitools.");
   }
 
   return parsed.hex;
@@ -448,11 +448,11 @@ function getDetailMarkdown(
 
 function getSwatchTableMarkdown(colours: string[], paths: string[]): string {
   return [
-    "| Colour | Hex |",
+    "| Color | Hex |",
     "| --- | --- |",
     ...colours.map(
       (colour, index) =>
-        `| ![Colour ${index + 1} swatch](${paths[index]}) | \`${colour}\` |`,
+        `| ![Color ${index + 1} swatch](${paths[index]}) | \`${colour}\` |`,
     ),
   ].join("\n");
 }
@@ -461,7 +461,7 @@ function getLocalHarmony(baseHex: string, harmonyType: HarmonyType): string[] {
   const baseRgb = hexToRgb(baseHex);
 
   if (!baseRgb) {
-    throw new Error(`Invalid colour: ${baseHex}`);
+    throw new Error(`Invalid color: ${baseHex}`);
   }
 
   const [hue, saturation, lightness] = rgbToHsl(baseRgb);

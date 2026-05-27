@@ -122,7 +122,7 @@ function ContrastCommand({
             <ActionPanel>
               <Action.Push
                 icon={Icon.Pencil}
-                title="Edit Colours"
+                title="Edit Colors"
                 target={
                   <ContrastForm initialFg={initialFg} initialBg={initialBg} />
                 }
@@ -285,7 +285,7 @@ function ContrastForm({
           ) : null}
           <Action
             icon={Icon.Switch}
-            title="Flip Colours"
+            title="Flip Colors"
             shortcut={{ modifiers: ["cmd"], key: "s" }}
             onAction={swapColours}
           />
@@ -321,7 +321,7 @@ function ContrastForm({
     >
       <Form.TextField
         id="bg"
-        title="Background Colour"
+        title="Background Color"
         placeholder="#1a1a2e, black, rgb(26 26 46), hsl(240 28% 14%)"
         value={values.bg}
         onChange={(bg) =>
@@ -333,7 +333,7 @@ function ContrastForm({
       />
       <Form.TextField
         id="fg"
-        title="Foreground Colour"
+        title="Foreground Color"
         placeholder="#eaeaea, white, rgb(234 234 234), hsl(0 0% 92%)"
         value={values.fg}
         onChange={(fg) =>
@@ -419,7 +419,7 @@ function ContrastDetail({
     } catch (error) {
       await showToast({
         style: Toast.Style.Failure,
-        title: "Could not swap colours",
+        title: "Could not swap colors",
         message: error instanceof Error ? error.message : String(error),
       });
     } finally {
@@ -497,7 +497,7 @@ function ContrastDetail({
           ) : null}
           <Action
             icon={Icon.Switch}
-            title="Flip Colours"
+            title="Flip Colors"
             shortcut={{ modifiers: ["cmd"], key: "s" }}
             onAction={swapColours}
           />
@@ -506,12 +506,12 @@ function ContrastDetail({
       metadata={
         <Detail.Metadata>
           <Detail.Metadata.Label
-            title="Background Colour"
+            title="Background Color"
             text={displayResult.bg}
             icon={{ source: Icon.Circle, tintColor: displayResult.bg }}
           />
           <Detail.Metadata.Label
-            title="Foreground Colour"
+            title="Foreground Color"
             text={displayResult.fg}
             icon={{ source: Icon.Circle, tintColor: displayResult.fg }}
           />

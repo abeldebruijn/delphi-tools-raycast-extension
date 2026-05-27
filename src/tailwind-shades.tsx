@@ -62,7 +62,7 @@ const SHADE_MODES: Array<{
   {
     label: "Vivid",
     value: "vivid",
-    description: "Higher chroma shades for stronger colour scales",
+    description: "Higher chroma shades for stronger color scales",
   },
   {
     label: "Muted",
@@ -297,7 +297,7 @@ function TailwindShadesCopyActions({
         shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
       />
       <Action.CopyToClipboard
-        title="Copy Base Colour"
+        title="Copy Base Color"
         content={result.colour}
         shortcut={{ modifiers: ["cmd"], key: "b" }}
       />
