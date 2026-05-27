@@ -28,13 +28,13 @@
     {
       "mode": "view",
       "name": "check-delphitools-install",
-      "title": "Check delphitools Install",
+      "title": "Check Delphitools Install",
       "description": "Check whether delphitools is installed"
     },
     {
       "mode": "view",
       "name": "delphi-tools",
-      "title": "delphitools",
+      "title": "Delphitools",
       "description": "Wrapper for delphitools"
     },
     {
@@ -334,9 +334,54 @@
           ]
         }
       ]
+    },
+    {
+      "mode": "view",
+      "name": "line-height",
+      "title": "Compute Line Height",
+      "description": "Compute named line-height ratios for a font size",
+      "icon": "line-height-icon.svg",
+      "arguments": [
+        {
+          "name": "fontSize",
+          "placeholder": "Font Size",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "mode": "view",
+      "name": "paper",
+      "title": "Paper Sizes",
+      "description": "Look up paper size dimensions",
+      "icon": "paper-icon.svg",
+      "arguments": [
+        {
+          "name": "name",
+          "placeholder": "Paper Size",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "mode": "view",
+      "name": "shavian",
+      "title": "Transliterate to Shavian",
+      "description": "Transliterate English text to the Shavian alphabet",
+      "icon": "shavian-icon.svg",
+      "arguments": [
+        {
+          "name": "text",
+          "placeholder": "Text",
+          "type": "text",
+          "required": false
+        }
+      ]
     }
   ],
-  "title": "delphi-tools-raycast-extension",
+  "title": "Delphi-Tools-Raycast-Extension",
   "author": "abeldebruijn",
   "platforms": [
     "Windows",

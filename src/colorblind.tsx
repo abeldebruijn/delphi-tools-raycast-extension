@@ -252,21 +252,21 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
             />
           ) : null}
           <ActionPanel.Section title="Switch Mode">
-            {COLOR_BLINDNESS_TYPES.filter((type) => type.value !== result.type).map(
-              (type) => (
-                <Action.Push
-                  key={type.value}
-                  icon={Icon.Eye}
-                  title={`Show ${type.label}`}
-                  target={
-                    <ColorBlindnessResultView
-                      colour={result.colour}
-                      type={type.value}
-                    />
-                  }
-                />
-              ),
-            )}
+            {COLOR_BLINDNESS_TYPES.filter(
+              (type) => type.value !== result.type,
+            ).map((type) => (
+              <Action.Push
+                key={type.value}
+                icon={Icon.Eye}
+                title={`Show ${type.label}`}
+                target={
+                  <ColorBlindnessResultView
+                    colour={result.colour}
+                    type={type.value}
+                  />
+                }
+              />
+            ))}
           </ActionPanel.Section>
         </ActionPanel>
       }
