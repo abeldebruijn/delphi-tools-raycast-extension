@@ -366,6 +366,9 @@ function ContrastDetail({
   useEffect(() => {
     let isMounted = true;
 
+    setPreview(undefined);
+    setPreviewError("");
+
     async function createPreview() {
       try {
         const path = await createTempTextSwatchPng({
