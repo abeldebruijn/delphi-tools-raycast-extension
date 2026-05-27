@@ -4,20 +4,19 @@ import {
   ActionPanel,
   Clipboard,
   Detail,
-  Form,
-  getSelectedText,
   Icon,
   showToast,
   Toast,
 } from "@raycast/api";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   DelphitoolsInstallStatusView,
   getDelphitoolsInstallStatus,
 } from "./delphitools-install";
+import { createTempSwatchPng } from "./swatch-png";
 
 const execFileAsync = promisify(execFile);
 
@@ -42,19 +41,18 @@ type CliHarmonyType =
   | "tetradic"
   | "split";
 
-type FormValues = {
-  colour: string;
-  harmonyType: HarmonyType;
-};
-
 type HarmonyResult = {
   colour: string;
   harmonyType: HarmonyType;
   colours: string[];
 };
 
-const DEFAULT_COLOUR = "#3b82f6";
+type HarmonySwatchPreview = {
+  paths: string[];
+};
+
 const DEFAULT_HARMONY_TYPE: HarmonyType = "complementary";
+const SWATCH_NAMESPACE = "harmony";
 
 const HARMONY_TYPES: Array<{ label: string; value: HarmonyType }> = [
   { label: "Complementary", value: "complementary" },
@@ -83,10 +81,10 @@ export default function Command(
 }
 
 function HarmonyCommand({
-  initialColour = "",
+  initialColour,
   initialHarmonyType = DEFAULT_HARMONY_TYPE,
 }: {
-  initialColour?: string;
+  initialColour: string;
   initialHarmonyType?: HarmonyType;
 }) {
   const [isDelphitoolsInstalled, setIsDelphitoolsInstalled] =
@@ -107,205 +105,134 @@ function HarmonyCommand({
   }
 
   return (
-    <HarmonyForm
-      initialColour={initialColour}
-      initialHarmonyType={initialHarmonyType}
+    <HarmonyResultView
+      colour={initialColour}
+      harmonyType={initialHarmonyType}
     />
   );
 }
 
-function HarmonyForm({
-  initialColour,
-  initialHarmonyType,
+function HarmonyResultView({
+  colour,
+  harmonyType,
 }: {
-  initialColour: string;
-  initialHarmonyType: HarmonyType;
+  colour: string;
+  harmonyType: HarmonyType;
 }) {
-  const [values, setValues] = useState<FormValues>({
-    colour: initialColour || DEFAULT_COLOUR,
-    harmonyType: initialHarmonyType,
-  });
   const [result, setResult] = useState<HarmonyResult>();
+  const [error, setError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const lastToastErrorRef = useRef("");
-  const canCopy = Boolean(result?.colours.length);
 
   useEffect(() => {
-    async function hydrateInitialColour() {
-      const colour = await getInitialColour();
-
-      if (!colour) {
-        return;
-      }
-
-      setValues((currentValues) => {
-        if (currentValues.colour !== DEFAULT_COLOUR) {
-          return currentValues;
-        }
-
-        return {
-          ...currentValues,
-          colour,
-        };
-      });
-    }
-
-    hydrateInitialColour();
-  }, []);
-
-  useEffect(() => {
-    if (!values.colour.trim()) {
+    if (!colour.trim()) {
       setResult(undefined);
-      lastToastErrorRef.current = "";
+      setError("Base colour is required.");
       setIsProcessing(false);
       return;
     }
 
+    let isMounted = true;
     setIsProcessing(true);
+    setError("");
 
-    const timeout = setTimeout(async () => {
+    async function loadResult() {
       try {
-        const colours = await runHarmony(values.colour, values.harmonyType);
+        const colours = await runHarmony(colour, harmonyType);
+
+        if (!isMounted) {
+          return;
+        }
 
         setResult({
-          colour: values.colour,
-          harmonyType: values.harmonyType,
+          colour,
+          harmonyType,
           colours,
         });
-        lastToastErrorRef.current = "";
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        const toastErrorKey = `${values.harmonyType}:${values.colour}:${message}`;
 
-        setResult(undefined);
-
-        if (lastToastErrorRef.current !== toastErrorKey) {
-          lastToastErrorRef.current = toastErrorKey;
-          await showToast({
-            style: Toast.Style.Failure,
-            title: "Could not generate harmony",
-            message,
-          });
+        if (!isMounted) {
+          return;
         }
+
+        setError(message);
+        setResult(undefined);
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "Could not generate harmony",
+          message,
+        });
       } finally {
-        setIsProcessing(false);
+        if (isMounted) {
+          setIsProcessing(false);
+        }
       }
-    }, 250);
+    }
+
+    loadResult();
 
     return () => {
-      clearTimeout(timeout);
+      isMounted = false;
     };
-  }, [values.colour, values.harmonyType]);
+  }, [colour, harmonyType]);
 
-  async function copyColours() {
-    if (!result) {
-      return;
-    }
-
-    await Clipboard.copy(result.colours.join("\n"));
-    await showToast({
-      style: Toast.Style.Success,
-      title: "Copied Harmony Colours",
-    });
-  }
-
-  async function copyCssVariables() {
-    if (!result) {
-      return;
-    }
-
-    await Clipboard.copy(formatCssVariables(result));
-    await showToast({
-      style: Toast.Style.Success,
-      title: "Copied CSS Variables",
-    });
+  if (result) {
+    return <HarmonyDetail result={result} />;
   }
 
   return (
-    <Form
+    <Detail
       isLoading={isProcessing}
-      actions={
-        <ActionPanel>
-          {result ? (
-            <Action.Push
-              icon={Icon.Eye}
-              title="Show Harmony Preview"
-              target={<HarmonyDetail result={result} />}
-            />
-          ) : null}
-          <Action
-            icon={Icon.Clipboard}
-            title="Copy Harmony Colours"
-            onAction={copyColours}
-          />
-          <Action
-            icon={Icon.Code}
-            title="Copy CSS Variables"
-            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-            onAction={copyCssVariables}
-          />
-          <Action.CopyToClipboard
-            title="Copy Base Colour"
-            content={values.colour}
-            shortcut={{ modifiers: ["cmd"], key: "b" }}
-          />
-          {canCopy
-            ? result.colours.map((colour, index) => (
-                <Action.CopyToClipboard
-                  key={`${colour}-${index}`}
-                  title={`Copy Colour ${index + 1}`}
-                  content={colour}
-                  shortcut={
-                    index < 9
-                      ? { modifiers: ["cmd"], key: String(index + 1) }
-                      : undefined
-                  }
-                />
-              ))
-            : null}
-        </ActionPanel>
+      markdown={
+        error
+          ? ["# Could not generate harmony", "", error].join("\n")
+          : "# Generating harmony..."
       }
-    >
-      <Form.TextField
-        id="colour"
-        title="Base Colour"
-        placeholder="#3b82f6, blue, rgb(59 130 246), hsl(217 91% 60%)"
-        value={values.colour}
-        onChange={(colour) =>
-          setValues((currentValues) => ({
-            ...currentValues,
-            colour,
-          }))
-        }
-      />
-      <Form.Dropdown
-        id="harmonyType"
-        title="Harmony Type"
-        value={values.harmonyType}
-        onChange={(harmonyType) =>
-          setValues((currentValues) => ({
-            ...currentValues,
-            harmonyType: harmonyType as HarmonyType,
-          }))
-        }
-      >
-        {HARMONY_TYPES.map((harmonyType) => (
-          <Form.Dropdown.Item
-            key={harmonyType.value}
-            title={harmonyType.label}
-            value={harmonyType.value}
-          />
-        ))}
-      </Form.Dropdown>
-      <Form.Description
-        title="Harmony Colours"
-        text={getResultText(result, isProcessing)}
-      />
-    </Form>
+    />
   );
 }
 
 function HarmonyDetail({ result }: { result: HarmonyResult }) {
+  const [swatchPreview, setSwatchPreview] = useState<HarmonySwatchPreview>();
+  const [swatchError, setSwatchError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function createPreview() {
+      try {
+        const paths = await Promise.all(
+          result.colours.map((colour) =>
+            createTempSwatchPng({
+              colour,
+              namespace: SWATCH_NAMESPACE,
+            }),
+          ),
+        );
+
+        if (!isMounted) {
+          return;
+        }
+
+        setSwatchPreview({ paths });
+        setSwatchError("");
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setSwatchPreview(undefined);
+        setSwatchError(error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    createPreview();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [result.colours]);
+
   async function copyColours() {
     await Clipboard.copy(result.colours.join("\n"));
     await showToast({
@@ -324,7 +251,8 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
 
   return (
     <Detail
-      markdown={getDetailMarkdown(result)}
+      isLoading={!swatchPreview && !swatchError}
+      markdown={getDetailMarkdown(result, swatchPreview, swatchError)}
       actions={
         <ActionPanel>
           <Action
@@ -350,6 +278,32 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
               }
             />
           ))}
+          {swatchPreview
+            ? swatchPreview.paths.map((filePath, index) => (
+                <Action.CopyToClipboard
+                  key={filePath}
+                  title={`Copy Swatch ${index + 1} Path`}
+                  content={filePath}
+                />
+              ))
+            : null}
+          <ActionPanel.Section title="Switch Harmony">
+            {HARMONY_TYPES.filter(
+              (harmonyType) => harmonyType.value !== result.harmonyType,
+            ).map((harmonyType) => (
+              <Action.Push
+                key={harmonyType.value}
+                icon={Icon.Eye}
+                title={`Show ${harmonyType.label}`}
+                target={
+                  <HarmonyResultView
+                    colour={result.colour}
+                    harmonyType={harmonyType.value}
+                  />
+                }
+              />
+            ))}
+          </ActionPanel.Section>
         </ActionPanel>
       }
       metadata={
@@ -379,20 +333,6 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
       }
     />
   );
-}
-
-async function getInitialColour(): Promise<string> {
-  try {
-    const selectedText = await getSelectedText();
-
-    if (selectedText.trim()) {
-      return selectedText.trim();
-    }
-  } catch {
-    // Selection is optional; clipboard is the fallback source.
-  }
-
-  return ((await Clipboard.readText()) ?? "").trim();
 }
 
 async function runHarmony(
@@ -474,38 +414,47 @@ function getHarmonyTypeLabel(harmonyType: HarmonyType): string {
   );
 }
 
-function getResultText(
-  result: HarmonyResult | undefined,
-  isProcessing: boolean,
+function getDetailMarkdown(
+  result: HarmonyResult,
+  swatchPreview: HarmonySwatchPreview | undefined,
+  swatchError: string,
 ): string {
-  if (isProcessing) {
-    return result ? `${result.colours.join(", ")}...` : "...";
+  if (swatchError) {
+    return [
+      `# ${getHarmonyTypeLabel(result.harmonyType)}`,
+      "",
+      "Could not generate swatch preview.",
+      "",
+      swatchError,
+      "",
+      result.colours.map((colour) => `- \`${colour}\``).join("\n"),
+    ].join("\n");
   }
 
-  return result?.colours.join(", ") || " ";
-}
+  if (!swatchPreview) {
+    return [
+      `# ${getHarmonyTypeLabel(result.harmonyType)}`,
+      "",
+      "Generating swatch preview...",
+    ].join("\n");
+  }
 
-function getDetailMarkdown(result: HarmonyResult): string {
   return [
-    `![Harmony preview](${getHarmonyPreviewImageUrl(result)})`,
-    "",
     `# ${getHarmonyTypeLabel(result.harmonyType)}`,
     "",
-    result.colours.map((colour) => `- \`${colour}\``).join("\n"),
+    getSwatchTableMarkdown(result.colours, swatchPreview.paths),
   ].join("\n");
 }
 
-function getHarmonyPreviewImageUrl(result: HarmonyResult): string {
-  const params = new URLSearchParams({
-    base: result.colours[0] ?? result.colour,
-    type: getPreviewHarmonyType(result.harmonyType),
-  });
-
-  return `http://localhost:3000/harmony-genny/image?${params.toString()}`;
-}
-
-function getPreviewHarmonyType(harmonyType: HarmonyType): string {
-  return harmonyType;
+function getSwatchTableMarkdown(colours: string[], paths: string[]): string {
+  return [
+    "| Colour | Hex |",
+    "| --- | --- |",
+    ...colours.map(
+      (colour, index) =>
+        `| ![Colour ${index + 1} swatch](${paths[index]}) | \`${colour}\` |`,
+    ),
+  ].join("\n");
 }
 
 function getLocalHarmony(baseHex: string, harmonyType: HarmonyType): string[] {

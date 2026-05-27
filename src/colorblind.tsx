@@ -4,20 +4,19 @@ import {
   ActionPanel,
   Clipboard,
   Detail,
-  Form,
-  getSelectedText,
   Icon,
   showToast,
   Toast,
 } from "@raycast/api";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   DelphitoolsInstallStatusView,
   getDelphitoolsInstallStatus,
 } from "./delphitools-install";
+import { createTempSwatchPng, normaliseHexColour } from "./swatch-png";
 
 const execFileAsync = promisify(execFile);
 
@@ -32,19 +31,24 @@ type ColorBlindnessType =
   | "achromatopsia"
   | "achromatomaly";
 
-type FormValues = {
-  colour: string;
-  type: ColorBlindnessType;
-};
-
 type ColorBlindnessResult = {
   colour: string;
   simulatedColour: string;
   type: ColorBlindnessType;
 };
 
-const DEFAULT_COLOUR = "#e63946";
+type ColorBlindnessCliResult = {
+  colour: string;
+  simulatedColour: string;
+};
+
+type SwatchPreview = {
+  sourcePath: string;
+  simulatedPath: string;
+};
+
 const DEFAULT_TYPE: ColorBlindnessType = "normal";
+const SWATCH_NAMESPACE = "colorblind";
 
 const COLOR_BLINDNESS_TYPES: Array<{
   label: string;
@@ -73,10 +77,10 @@ export default function Command(
 }
 
 function ColorBlindnessCommand({
-  initialColour = "",
+  initialColour,
   initialType = DEFAULT_TYPE,
 }: {
-  initialColour?: string;
+  initialColour: string;
   initialType?: ColorBlindnessType;
 }) {
   const [isDelphitoolsInstalled, setIsDelphitoolsInstalled] =
@@ -96,192 +100,126 @@ function ColorBlindnessCommand({
     return <DelphitoolsInstallStatusView status={{ installed: false }} />;
   }
 
-  return (
-    <ColorBlindnessForm
-      initialColour={initialColour}
-      initialType={initialType}
-    />
-  );
+  return <ColorBlindnessResultView colour={initialColour} type={initialType} />;
 }
 
-function ColorBlindnessForm({
-  initialColour,
-  initialType,
+function ColorBlindnessResultView({
+  colour,
+  type,
 }: {
-  initialColour: string;
-  initialType: ColorBlindnessType;
+  colour: string;
+  type: ColorBlindnessType;
 }) {
-  const [values, setValues] = useState<FormValues>({
-    colour: initialColour || DEFAULT_COLOUR,
-    type: initialType,
-  });
   const [result, setResult] = useState<ColorBlindnessResult>();
+  const [error, setError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const lastToastErrorRef = useRef("");
 
   useEffect(() => {
-    async function hydrateInitialColour() {
-      const colour = await getInitialColour();
-
-      if (!colour) {
-        return;
-      }
-
-      setValues((currentValues) => {
-        if (currentValues.colour !== DEFAULT_COLOUR) {
-          return currentValues;
-        }
-
-        return {
-          ...currentValues,
-          colour,
-        };
-      });
-    }
-
-    hydrateInitialColour();
-  }, []);
-
-  useEffect(() => {
-    if (!values.colour.trim()) {
+    if (!colour.trim()) {
       setResult(undefined);
-      lastToastErrorRef.current = "";
+      setError("Colour is required.");
       setIsProcessing(false);
       return;
     }
 
+    let isMounted = true;
     setIsProcessing(true);
+    setError("");
 
-    const timeout = setTimeout(async () => {
+    async function loadResult() {
       try {
-        const simulatedColour = await runColorBlindnessSimulation(
-          values.colour,
-          values.type,
-        );
+        const nextResult = await runColorBlindnessSimulation(colour, type);
+
+        if (!isMounted) {
+          return;
+        }
 
         setResult({
-          colour: values.colour,
-          simulatedColour,
-          type: values.type,
+          colour: nextResult.colour,
+          simulatedColour: nextResult.simulatedColour,
+          type,
         });
-        lastToastErrorRef.current = "";
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        const toastErrorKey = `${values.type}:${values.colour}:${message}`;
 
-        setResult(undefined);
-
-        if (lastToastErrorRef.current !== toastErrorKey) {
-          lastToastErrorRef.current = toastErrorKey;
-          await showToast({
-            style: Toast.Style.Failure,
-            title: "Could not simulate colour blindness",
-            message,
-          });
+        if (!isMounted) {
+          return;
         }
+
+        setError(message);
+        setResult(undefined);
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "Could not simulate colour blindness",
+          message,
+        });
       } finally {
-        setIsProcessing(false);
+        if (isMounted) {
+          setIsProcessing(false);
+        }
       }
-    }, 250);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [values.colour, values.type]);
-
-  async function copySimulatedColour() {
-    if (!result) {
-      return;
     }
 
-    await Clipboard.copy(result.simulatedColour);
-    await showToast({
-      style: Toast.Style.Success,
-      title: "Copied Simulated Colour",
-    });
-  }
+    loadResult();
 
-  async function copyPreviewUrl() {
-    const previewUrl = getPreviewImageUrl(result ?? values);
+    return () => {
+      isMounted = false;
+    };
+  }, [colour, type]);
 
-    await Clipboard.copy(previewUrl);
-    await showToast({
-      style: Toast.Style.Success,
-      title: "Copied Preview Image URL",
-    });
+  if (result) {
+    return <ColorBlindnessDetail result={result} />;
   }
 
   return (
-    <Form
+    <Detail
       isLoading={isProcessing}
-      actions={
-        <ActionPanel>
-          {result ? (
-            <Action.Push
-              icon={Icon.Eye}
-              title="Show Colour Blindness Preview"
-              target={<ColorBlindnessDetail result={result} />}
-            />
-          ) : null}
-          <Action
-            icon={Icon.Clipboard}
-            title="Copy Simulated Colour"
-            onAction={copySimulatedColour}
-          />
-          <Action.CopyToClipboard
-            title="Copy Source Colour"
-            content={values.colour}
-            shortcut={{ modifiers: ["cmd"], key: "b" }}
-          />
-          <Action
-            icon={Icon.Link}
-            title="Copy Preview Image URL"
-            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-            onAction={copyPreviewUrl}
-          />
-        </ActionPanel>
+      markdown={
+        error
+          ? ["# Could not simulate colour blindness", "", error].join("\n")
+          : "# Simulating colour blindness..."
       }
-    >
-      <Form.TextField
-        id="colour"
-        title="Colour"
-        placeholder="#e63946, red, rgb(230 57 70), hsl(355 78% 56%)"
-        value={values.colour}
-        onChange={(colour) =>
-          setValues((currentValues) => ({
-            ...currentValues,
-            colour,
-          }))
-        }
-      />
-      <Form.Dropdown
-        id="type"
-        title="Colour Blindness Type"
-        value={values.type}
-        onChange={(type) =>
-          setValues((currentValues) => ({
-            ...currentValues,
-            type: type as ColorBlindnessType,
-          }))
-        }
-      >
-        {COLOR_BLINDNESS_TYPES.map((type) => (
-          <Form.Dropdown.Item
-            key={type.value}
-            title={type.label}
-            value={type.value}
-          />
-        ))}
-      </Form.Dropdown>
-      <Form.Description
-        title="Simulated Colour"
-        text={getResultText(result, isProcessing)}
-      />
-    </Form>
+    />
   );
 }
 
 function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
+  const [swatchPreview, setSwatchPreview] = useState<SwatchPreview>();
+  const [swatchError, setSwatchError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function createPreview() {
+      try {
+        const nextSwatchPreview = {
+          sourcePath: await createSwatchPng(result.colour),
+          simulatedPath: await createSwatchPng(result.simulatedColour),
+        };
+
+        if (!isMounted) {
+          return;
+        }
+
+        setSwatchPreview(nextSwatchPreview);
+        setSwatchError("");
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setSwatchPreview(undefined);
+        setSwatchError(error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    createPreview();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [result.colour, result.simulatedColour]);
+
   async function copySimulatedColour() {
     await Clipboard.copy(result.simulatedColour);
     await showToast({
@@ -292,7 +230,8 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
 
   return (
     <Detail
-      markdown={getDetailMarkdown(result)}
+      isLoading={!swatchPreview && !swatchError}
+      markdown={getDetailMarkdown(result, swatchPreview, swatchError)}
       actions={
         <ActionPanel>
           <Action
@@ -305,11 +244,30 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
             content={result.colour}
             shortcut={{ modifiers: ["cmd"], key: "b" }}
           />
-          <Action.CopyToClipboard
-            title="Copy Preview Image URL"
-            content={getPreviewImageUrl(result)}
-            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-          />
+          {swatchPreview ? (
+            <Action.CopyToClipboard
+              title="Copy Simulated Swatch Path"
+              content={swatchPreview.simulatedPath}
+              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+            />
+          ) : null}
+          <ActionPanel.Section title="Switch Mode">
+            {COLOR_BLINDNESS_TYPES.filter((type) => type.value !== result.type).map(
+              (type) => (
+                <Action.Push
+                  key={type.value}
+                  icon={Icon.Eye}
+                  title={`Show ${type.label}`}
+                  target={
+                    <ColorBlindnessResultView
+                      colour={result.colour}
+                      type={type.value}
+                    />
+                  }
+                />
+              ),
+            )}
+          </ActionPanel.Section>
         </ActionPanel>
       }
       metadata={
@@ -337,24 +295,10 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
   );
 }
 
-async function getInitialColour(): Promise<string> {
-  try {
-    const selectedText = await getSelectedText();
-
-    if (selectedText.trim()) {
-      return selectedText.trim();
-    }
-  } catch {
-    // Selection is optional; clipboard is the fallback source.
-  }
-
-  return ((await Clipboard.readText()) ?? "").trim();
-}
-
 async function runColorBlindnessSimulation(
   colour: string,
   type: ColorBlindnessType,
-): Promise<string> {
+): Promise<ColorBlindnessCliResult> {
   const { stdout } = await execFileAsync("delphitools", [
     "colorblind",
     "--json",
@@ -367,19 +311,29 @@ async function runColorBlindnessSimulation(
   return parseColourOutput(stdout);
 }
 
-function parseColourOutput(stdout: string): string {
+function parseColourOutput(stdout: string): ColorBlindnessCliResult {
   const parsed = JSON.parse(stdout) as unknown;
 
   if (typeof parsed === "string") {
-    return parsed;
+    const colour = normaliseHexColour(parsed);
+
+    return {
+      colour,
+      simulatedColour: colour,
+    };
   }
 
   if (parsed && typeof parsed === "object") {
+    const output = parsed as Record<string, unknown>;
+
     for (const key of ["hex", "colour", "color", "result"]) {
-      const value = (parsed as Record<string, unknown>)[key];
+      const value = output[key];
 
       if (typeof value === "string") {
-        return value;
+        return {
+          colour: getOriginalHex(output) ?? normaliseHexColour(value),
+          simulatedColour: normaliseHexColour(value),
+        };
       }
     }
   }
@@ -405,48 +359,58 @@ function getColorBlindnessTypeLabel(type: ColorBlindnessType): string {
   );
 }
 
-function getResultText(
-  result: ColorBlindnessResult | undefined,
-  isProcessing: boolean,
+function getDetailMarkdown(
+  result: ColorBlindnessResult,
+  swatchPreview: SwatchPreview | undefined,
+  swatchError: string,
 ): string {
-  if (isProcessing) {
-    return result ? `${result.simulatedColour}...` : "...";
+  if (swatchError) {
+    return [
+      `# ${getColorBlindnessTypeLabel(result.type)}`,
+      "",
+      "Could not generate swatch preview.",
+      "",
+      swatchError,
+      "",
+      `Source: \`${result.colour}\``,
+      "",
+      `Simulated: \`${result.simulatedColour}\``,
+    ].join("\n");
   }
 
-  return result?.simulatedColour || " ";
-}
+  if (!swatchPreview) {
+    return [
+      `# ${getColorBlindnessTypeLabel(result.type)}`,
+      "",
+      "Generating swatch preview...",
+    ].join("\n");
+  }
 
-function getDetailMarkdown(result: ColorBlindnessResult): string {
   return [
-    `![Colour blindness preview](${getPreviewImageUrl(result)})`,
-    "",
-    `<svg height="100" width="100" xmlns="http://www.w3.org/2000/svg">
-      <circle r="45" cx="50" cy="50" stroke="green" stroke-width="3" fill="red" />
-      Sorry, your browser does not support inline SVG.
-    </svg>`,
-    "",
     `# ${getColorBlindnessTypeLabel(result.type)}`,
     "",
-    `Source: \`${result.colour}\``,
-    "",
-    `Simulated: \`${result.simulatedColour}\``,
+    `| Original | ${getColorBlindnessTypeLabel(result.type)} |`,
+    "| --- | --- |",
+    `| ![Original swatch](${swatchPreview.sourcePath}) | ![Simulated swatch](${swatchPreview.simulatedPath}) |`,
+    `| \`${result.colour}\` | \`${result.simulatedColour}\` |`,
   ].join("\n");
 }
 
-function getPreviewImageUrl({
-  colour,
-  type,
-}: {
-  colour: string;
-  type: ColorBlindnessType;
-}): string {
-  const params = new URLSearchParams({
-    color: colour,
-  });
+function getOriginalHex(output: Record<string, unknown>): string | undefined {
+  for (const key of ["original_hex", "originalHex", "input"]) {
+    const value = output[key];
 
-  if (type !== "normal") {
-    params.set("type", type);
+    if (typeof value === "string") {
+      return normaliseHexColour(value);
+    }
   }
 
-  return `http://localhost:3000/colorblind-sim/image?${params.toString()}`;
+  return undefined;
+}
+
+async function createSwatchPng(colour: string): Promise<string> {
+  return createTempSwatchPng({
+    colour,
+    namespace: SWATCH_NAMESPACE,
+  });
 }
