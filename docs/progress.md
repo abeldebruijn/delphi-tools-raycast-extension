@@ -4,43 +4,44 @@ Hardness estimates are for wrapping each `delphitools` command as a Raycast comm
 
 ## Not started
 
-| Tool                                                | Extension hardness | Raycast ease | Progress    |
-| --------------------------------------------------- | ------------------ | ------------ | ----------- |
-| [barcode](./delphitools/barcode.md)                 | Moderate           | Moderate     | Not started |
-| [clip](./delphitools/clip.md)                       | Moderate           | Moderate     | Not started |
-| [convert](./delphitools/convert.md)                 | Moderate           | Moderate     | Not started |
-| [crop](./delphitools/crop.md)                       | Moderate           | Moderate     | Not started |
-| [favicon](./delphitools/favicon.md)                 | Moderate           | Moderate     | Not started |
-| [font-info](./delphitools/font-info.md)             | Moderate           | Moderate     | Not started |
-| [impose](./delphitools/impose.md)                   | Hard               | Moderate     | Not started |
-| [line-height](./delphitools/line-height.md)         | Easy               | Easy         | Not started |
-| [matte](./delphitools/matte.md)                     | Moderate           | Moderate     | Not started |
-| [meta](./delphitools/meta.md)                       | Easy               | Easy         | Not started |
-| [noise](./delphitools/noise.md)                     | Moderate           | Moderate     | Not started |
-| [palette](./delphitools/palette.md)                 | Moderate           | Easy         | Not started |
-| [paper](./delphitools/paper.md)                     | Easy               | Easy         | Not started |
-| [preflight](./delphitools/preflight.md)             | Hard               | Moderate     | Not started |
-| [qr](./delphitools/qr.md)                           | Moderate           | Easy         | Not started |
-| [regex](./delphitools/regex.md)                     | Easy               | Easy         | Not started |
-| [remove background](./delphitools/rmbg.md)          | Hard               | Moderate     | Not started |
-| [scroll](./delphitools/scroll.md)                   | Hard               | Moderate     | Not started |
-| [shavian](./delphitools/shavian.md)                 | Easy               | Easy         | Not started |
-| [split](./delphitools/split.md)                     | Moderate           | Moderate     | Not started |
-| [optimise SVG files](./delphitools/svgo.md)         | Moderate           | Moderate     | Not started |
-| [trace](./delphitools/trace.md)                     | Hard               | Moderate     | Not started |
-| [watermark](./delphitools/watermark.md)             | Moderate           | Moderate     | Not started |
-| [zine](./delphitools/zine.md)                       | Hard               | Moderate     | Not started |
+| Tool                                        | Extension hardness | Raycast ease | Progress    |
+| ------------------------------------------- | ------------------ | ------------ | ----------- |
+| [barcode](./delphitools/barcode.md)         | Moderate           | Moderate     | Not started |
+| [clip](./delphitools/clip.md)               | Moderate           | Moderate     | Not started |
+| [convert](./delphitools/convert.md)         | Moderate           | Moderate     | Not started |
+| [crop](./delphitools/crop.md)               | Moderate           | Moderate     | Not started |
+| [favicon](./delphitools/favicon.md)         | Moderate           | Moderate     | Not started |
+| [font-info](./delphitools/font-info.md)     | Moderate           | Moderate     | Not started |
+| [impose](./delphitools/impose.md)           | Hard               | Moderate     | Not started |
+| [line-height](./delphitools/line-height.md) | Easy               | Easy         | Not started |
+| [matte](./delphitools/matte.md)             | Moderate           | Moderate     | Not started |
+| [meta](./delphitools/meta.md)               | Easy               | Easy         | Not started |
+| [noise](./delphitools/noise.md)             | Moderate           | Moderate     | Not started |
+| [palette](./delphitools/palette.md)         | Moderate           | Easy         | Not started |
+| [paper](./delphitools/paper.md)             | Easy               | Easy         | Not started |
+| [preflight](./delphitools/preflight.md)     | Hard               | Moderate     | Not started |
+| [qr](./delphitools/qr.md)                   | Moderate           | Easy         | Not started |
+| [regex](./delphitools/regex.md)             | Easy               | Easy         | Not started |
+| [remove background](./delphitools/rmbg.md)  | Hard               | Moderate     | Not started |
+| [scroll](./delphitools/scroll.md)           | Hard               | Moderate     | Not started |
+| [shavian](./delphitools/shavian.md)         | Easy               | Easy         | Not started |
+| [split](./delphitools/split.md)             | Moderate           | Moderate     | Not started |
+| [optimise SVG files](./delphitools/svgo.md) | Moderate           | Moderate     | Not started |
+| [trace](./delphitools/trace.md)             | Hard               | Moderate     | Not started |
+| [watermark](./delphitools/watermark.md)     | Moderate           | Moderate     | Not started |
+| [zine](./delphitools/zine.md)               | Hard               | Moderate     | Not started |
 
 ## Implemented
 
-| Tool                                      | Progress                                                                                                                                                                                                                                                                             |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [decode](./delphitools/decode.md)         | Implemented as a clipboard/selection-first Command with base64 and URL support                                                                                                                                                                                                       |
-| [encode](./delphitools/encode.md)         | Implemented as a clipboard/selection-first Command with base64 and URL support                                                                                                                                                                                                       |
-| [hash](./delphitools/hash.md)             | Implemented as a clipboard/selection-first Command with md5, sha1, sha256, and sha512 support                                                                                                                                                                                        |
-| [contrast](./delphitools/contrast.md)     | Implemented as a live foreground/background colour Form; accepts hex, CSS names, rgb(), and hsl().                                                                                                                                                                                   |
-| [harmony](./delphitools/harmony.md)       | Implemented as required base-colour and harmony-type Command arguments with direct swatch Detail output, copy actions, and switch-harmony actions for all 12 harmony-genny types                                                                                                    |
-| [colorblind](./delphitools/colorblind.md) | Implemented as required colour and colour-blindness-type Command arguments with direct swatch Detail output, copy actions, and switch-mode actions for all nine colour blindness modes                                                                                               |
+| Tool                                                | Progress                                                                                                                                                                                                                                    |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [decode](./delphitools/decode.md)                   | Implemented as a clipboard/selection-first Command with base64 and URL support                                                                                                                                                              |
+| [encode](./delphitools/encode.md)                   | Implemented as a clipboard/selection-first Command with base64 and URL support                                                                                                                                                              |
+| [hash](./delphitools/hash.md)                       | Implemented as a clipboard/selection-first Command with md5, sha1, sha256, and sha512 support                                                                                                                                               |
+| [contrast](./delphitools/contrast.md)               | Implemented as a live foreground/background colour Form; accepts hex, CSS names, rgb(), and hsl().                                                                                                                                          |
+| [harmony](./delphitools/harmony.md)                 | Implemented as required base-colour and harmony-type Command arguments with direct swatch Detail output, copy actions, and switch-harmony actions for all 12 harmony-genny types                                                            |
+| [colorblind](./delphitools/colorblind.md)           | Implemented as required colour and colour-blindness-type Command arguments with direct swatch Detail output, copy actions, and switch-mode actions for all nine colour blindness modes                                                      |
+| [colorblind image](./delphitools/colorblind.md)     | Implemented as a file-picker Form that writes a temporary simulated image preview with open, copy-image, copy-path, and switch-mode actions for all nine colour blindness modes; defaults to deuteranopia                                   |
 | [tailwind shades](./delphitools/tailwind-shades.md) | Implemented as a required base-colour Command argument with optional classic/vivid/muted/hue-shift mode, direct swatch List output, per-shade copy actions, and CSS variable, OKLCH variable, Tailwind config, and shade-scale copy actions |
 
 ## Not planned (already in Raycast core)

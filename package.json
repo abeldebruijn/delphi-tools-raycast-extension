@@ -291,6 +291,13 @@
     },
     {
       "mode": "view",
+      "name": "simulate-colour-blindness-image",
+      "title": "Simulate Colour Blindness (Image)",
+      "description": "Simulate how an image appears with colour blindness",
+      "icon": "colorblind-icon.svg"
+    },
+    {
+      "mode": "view",
       "name": "tailwind-shades",
       "title": "Generate Tailwind Shades",
       "description": "Generate Tailwind CSS colour shades from a base colour",

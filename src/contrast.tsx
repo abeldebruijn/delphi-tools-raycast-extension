@@ -18,7 +18,7 @@ import {
   DelphitoolsInstallStatusView,
   getDelphitoolsInstallStatus,
 } from "./delphitools-install";
-import { createTempTextSwatchPng } from "./swatch-png";
+import { createTempTextSwatchSvg } from "./swatch-png";
 
 const execFileAsync = promisify(execFile);
 
@@ -371,7 +371,7 @@ function ContrastDetail({
 
     async function createPreview() {
       try {
-        const path = await createTempTextSwatchPng({
+        const path = await createTempTextSwatchSvg({
           backgroundColour: displayResult.bg,
           foregroundColour: displayResult.fg,
           namespace: SWATCH_NAMESPACE,

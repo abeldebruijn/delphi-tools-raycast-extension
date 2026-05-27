@@ -18,6 +18,8 @@ export type CreateTempTextSwatchPngOptions = {
   height?: number;
 };
 
+export type CreateTempTextSwatchSvgOptions = CreateTempTextSwatchPngOptions;
+
 const DEFAULT_SWATCH_WIDTH = 180;
 const DEFAULT_SWATCH_HEIGHT = 96;
 const DEFAULT_TEXT_SWATCH_WIDTH = 720;
@@ -66,13 +68,47 @@ export async function createTempTextSwatchPng({
   return filePath;
 }
 
-async function writeTempSwatch(filePath: string, buffer: Buffer): Promise<void> {
+export async function createTempTextSwatchSvg({
+  backgroundColour,
+  foregroundColour,
+  namespace,
+  width = DEFAULT_TEXT_SWATCH_WIDTH,
+  height = DEFAULT_TEXT_SWATCH_HEIGHT,
+}: CreateTempTextSwatchSvgOptions): Promise<string> {
+  const backgroundHex = normaliseHexColour(backgroundColour);
+  const foregroundHex = normaliseHexColour(foregroundColour);
+  const filePath = getTempTextSwatchPath({
+    backgroundHex,
+    foregroundHex,
+    namespace,
+    width,
+    height,
+    extension: "svg",
+  });
+
+  await writeTempSwatch(
+    filePath,
+    Buffer.from(
+      encodeTextSwatchSvg({ backgroundHex, foregroundHex, width, height }),
+      "utf8",
+    ),
+  );
+
+  return filePath;
+}
+
+async function writeTempSwatch(
+  filePath: string,
+  buffer: Buffer,
+): Promise<void> {
   const previousWrite = pendingSwatchWrites.get(filePath) ?? Promise.resolve();
 
-  const currentWrite = previousWrite.catch(() => undefined).then(async () => {
-    await mkdir(path.dirname(filePath), { recursive: true });
-    await writeFile(filePath, buffer);
-  });
+  const currentWrite = previousWrite
+    .catch(() => undefined)
+    .then(async () => {
+      await mkdir(path.dirname(filePath), { recursive: true });
+      await writeFile(filePath, buffer);
+    });
 
   pendingSwatchWrites.set(filePath, currentWrite);
 
@@ -123,12 +159,14 @@ function getTempTextSwatchPath({
   namespace,
   width,
   height,
+  extension = "png",
 }: {
   backgroundHex: string;
   foregroundHex: string;
   namespace: string;
   width: number;
   height: number;
+  extension?: "png" | "svg";
 }): string {
   const fileSafeNamespace = namespace.replace(/[^a-zA-Z0-9_-]/g, "-");
 
@@ -136,7 +174,7 @@ function getTempTextSwatchPath({
     tmpdir(),
     "delphitools-raycast-extension",
     fileSafeNamespace,
-    `text-swatch-${width}x${height}-${backgroundHex.slice(1)}-${foregroundHex.slice(1)}.png`,
+    `text-swatch-${width}x${height}-${backgroundHex.slice(1)}-${foregroundHex.slice(1)}.${extension}`,
   );
 }
 
@@ -203,6 +241,30 @@ function encodeTextSwatchPng({
   );
 
   return encodeRawPng({ raw, width, height });
+}
+
+function encodeTextSwatchSvg({
+  backgroundHex,
+  foregroundHex,
+  width,
+  height,
+}: {
+  backgroundHex: string;
+  foregroundHex: string;
+  width: number;
+  height: number;
+}): string {
+  const x = Math.max(24, Math.round(width * 0.05));
+  const y = Math.max(72, Math.round(height * 0.28));
+
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Contrast preview">`,
+    `  <rect width="100%" height="100%" fill="${backgroundHex}"/>`,
+    `  <text x="${x}" y="${y}" fill="${foregroundHex}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="48" font-weight="700">Large Text (24px+)</text>`,
+    `  <text x="${x}" y="${y + 74}" fill="${foregroundHex}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="32">Normal text at 16px. The quick brown fox jumps.</text>`,
+    `  <text x="${x}" y="${y + 124}" fill="${foregroundHex}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24">Small text at 14px for fine print and captions.</text>`,
+    "</svg>",
+  ].join("\n");
 }
 
 function createRawImage({
