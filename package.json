@@ -224,6 +224,64 @@
           ]
         }
       ]
+    },
+    {
+      "mode": "view",
+      "name": "colorblind",
+      "title": "Simulate Colour Blindness",
+      "description": "Simulate how a colour appears with colour blindness",
+      "arguments": [
+        {
+          "name": "colour",
+          "placeholder": "Colour",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "type",
+          "placeholder": "Colour Blindness Type",
+          "type": "dropdown",
+          "required": false,
+          "data": [
+            {
+              "title": "Normal",
+              "value": "normal"
+            },
+            {
+              "title": "Protanopia",
+              "value": "protanopia"
+            },
+            {
+              "title": "Deuteranopia",
+              "value": "deuteranopia"
+            },
+            {
+              "title": "Tritanopia",
+              "value": "tritanopia"
+            },
+            {
+              "title": "Protanomaly",
+              "value": "protanomaly"
+            },
+            {
+              "title": "Deuteranomaly",
+              "value": "deuteranomaly"
+            },
+            {
+              "title": "Tritanomaly",
+              "value": "tritanomaly"
+            },
+            {
+              "title": "Achromatopsia",
+              "value": "achromatopsia"
+            },
+            {
+              "title": "Achromatomaly",
+              "value": "achromatomaly"
+            }
+          ]
+        }
+      ]
     }
   ],
   "title": "delphi-tools-raycast-extension",
