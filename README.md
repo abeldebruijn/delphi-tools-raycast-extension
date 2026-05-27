@@ -13,6 +13,9 @@ Run local design and text utilities from [delphitools](https://tools.rmv.fyi/) i
 - Generate Color Harmony
 - Simulate Color Blindness
 - Simulate Color Blindness (Image)
+- Generate Barcode
+- Trim Transparent Edges
+- Convert Images
 - Generate Tailwind Shades
 - Compute Line Height
 - Paper Sizes
