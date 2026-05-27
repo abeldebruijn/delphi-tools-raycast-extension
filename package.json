@@ -170,13 +170,13 @@
           "name": "colour",
           "placeholder": "Base Colour",
           "type": "text",
-          "required": false
+          "required": true
         },
         {
           "name": "harmonyType",
           "placeholder": "Harmony Type",
           "type": "dropdown",
-          "required": false,
+          "required": true,
           "data": [
             {
               "title": "Complementary",
@@ -241,13 +241,13 @@
           "name": "colour",
           "placeholder": "Colour",
           "type": "text",
-          "required": false
+          "required": true
         },
         {
           "name": "type",
           "placeholder": "Colour Blindness Type",
           "type": "dropdown",
-          "required": false,
+          "required": true,
           "data": [
             {
               "title": "Normal",
