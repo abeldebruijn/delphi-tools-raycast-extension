@@ -36,9 +36,9 @@ export function DelphitoolsInstallStatusView({
   if (!status.installed) {
     return (
       <Detail
-        markdown={`# delphitools is not installed
+        markdown={`# delphitools CLI Not Installed
 
-Install the local CLI before using this Raycast Extension.
+This extension runs the local \`delphitools\` CLI. Install it with Cargo, then run this command again.
 
 \`\`\`sh
 ${INSTALL_COMMAND}
@@ -47,6 +47,7 @@ ${INSTALL_COMMAND}
         actions={
           <ActionPanel>
             <Action.CopyToClipboard
+              icon={Icon.Clipboard}
               title="Copy Install Command"
               content={INSTALL_COMMAND}
             />
@@ -68,7 +69,7 @@ ${INSTALL_COMMAND}
 
   return (
     <Detail
-      markdown={`# delphitools is installed
+      markdown={`# delphitools CLI Installed
 
 ${status.version || "The local CLI is available on PATH."}
 `}

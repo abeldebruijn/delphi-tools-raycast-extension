@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "delphi-tools-raycast-extension",
-  "description": "Wrapper for delphi tools",
+  "description": "Run local design and text utilities from delphitools in Raycast",
   "license": "MIT",
   "scripts": {
     "dev": "ray develop",
@@ -142,7 +142,7 @@
       "mode": "view",
       "name": "contrast",
       "title": "Check Contrast",
-      "description": "Check WCAG contrast ratio between foreground and background colours",
+      "description": "Check WCAG contrast ratio between foreground and background colors",
       "icon": "contrast-icon.svg",
       "arguments": [
         {
@@ -162,13 +162,13 @@
     {
       "mode": "view",
       "name": "harmony",
-      "title": "Generate Colour Harmony",
-      "description": "Generate colour harmonies from a base colour",
+      "title": "Generate Color Harmony",
+      "description": "Generate color harmonies from a base color",
       "icon": "harmony-icon.svg",
       "arguments": [
         {
           "name": "colour",
-          "placeholder": "Base Colour",
+          "placeholder": "Base Color",
           "type": "text",
           "required": true
         },
@@ -233,19 +233,19 @@
     {
       "mode": "view",
       "name": "colorblind",
-      "title": "Simulate Colour Blindness",
-      "description": "Simulate how a colour appears with colour blindness",
+      "title": "Simulate Color Blindness",
+      "description": "Simulate how a color appears with color blindness",
       "icon": "colorblind-icon.svg",
       "arguments": [
         {
           "name": "colour",
-          "placeholder": "Colour",
+          "placeholder": "Color",
           "type": "text",
           "required": true
         },
         {
           "name": "type",
-          "placeholder": "Colour Blindness Type",
+          "placeholder": "Color Blindness Type",
           "type": "dropdown",
           "required": true,
           "data": [
@@ -292,8 +292,8 @@
     {
       "mode": "view",
       "name": "simulate-colour-blindness-image",
-      "title": "Simulate Colour Blindness (Image)",
-      "description": "Simulate how an image appears with colour blindness",
+      "title": "Simulate Color Blindness (Image)",
+      "description": "Simulate how an image appears with color blindness",
       "icon": "colorblind-icon.svg"
     },
     {
@@ -321,12 +321,12 @@
       "mode": "view",
       "name": "tailwind-shades",
       "title": "Generate Tailwind Shades",
-      "description": "Generate Tailwind CSS colour shades from a base colour",
+      "description": "Generate Tailwind CSS color shades from a base color",
       "icon": "tailwind-shades-icon.svg",
       "arguments": [
         {
           "name": "colour",
-          "placeholder": "Base Colour",
+          "placeholder": "Base Color",
           "type": "text",
           "required": true
         },
@@ -402,7 +402,7 @@
       ]
     }
   ],
-  "title": "Delphi-Tools-Raycast-Extension",
+  "title": "Delphitools",
   "author": "abeldebruijn",
   "platforms": [
     "Windows",

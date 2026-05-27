@@ -62,7 +62,7 @@ const SHADE_MODES: Array<{
   {
     label: "Vivid",
     value: "vivid",
-    description: "Higher chroma shades for stronger colour scales",
+    description: "Higher chroma shades for stronger color scales",
   },
   {
     label: "Muted",
@@ -197,16 +197,19 @@ function TailwindShadesList({
               actions={
                 <ActionPanel>
                   <Action.CopyToClipboard
+                    icon={Icon.Clipboard}
                     title="Copy Shade Hex"
                     content={shade.hex}
                   />
                   {shade.oklch ? (
                     <Action.CopyToClipboard
+                      icon={Icon.Clipboard}
                       title="Copy Shade OKLCH"
                       content={shade.oklch}
                     />
                   ) : null}
                   <Action.CopyToClipboard
+                    icon={Icon.Code}
                     title="Copy CSS Variable"
                     content={`--${result.colourName}-${shade.name}: ${shade.hex};`}
                   />
@@ -282,22 +285,26 @@ function TailwindShadesCopyActions({
   return (
     <>
       <Action.CopyToClipboard
+        icon={Icon.List}
         title="Copy Shade Scale"
         content={formatShadeScale(result)}
         shortcut={{ modifiers: ["cmd"], key: "s" }}
       />
       <Action.CopyToClipboard
+        icon={Icon.Code}
         title="Copy CSS Variables (OKLCH)"
         content={formatOklchCssVariables(result)}
         shortcut={{ modifiers: ["cmd", "shift"], key: "o" }}
       />
       <Action.CopyToClipboard
+        icon={Icon.Code}
         title="Copy Tailwind Config"
         content={formatTailwindConfig(result)}
         shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
       />
       <Action.CopyToClipboard
-        title="Copy Base Colour"
+        icon={Icon.Clipboard}
+        title="Copy Base Color"
         content={result.colour}
         shortcut={{ modifiers: ["cmd"], key: "b" }}
       />

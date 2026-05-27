@@ -230,6 +230,7 @@ function CodecForm({
             onAction={swapDirection}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title="Copy Input"
             content={values.input}
             shortcut={{ modifiers: ["cmd"], key: "i" }}

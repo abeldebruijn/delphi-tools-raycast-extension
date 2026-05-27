@@ -117,7 +117,7 @@ function ColorBlindnessResultView({
   useEffect(() => {
     if (!colour.trim()) {
       setResult(undefined);
-      setError("Colour is required.");
+      setError("Color is required.");
       setIsProcessing(false);
       return;
     }
@@ -150,7 +150,7 @@ function ColorBlindnessResultView({
         setResult(undefined);
         await showToast({
           style: Toast.Style.Failure,
-          title: "Could not simulate colour blindness",
+          title: "Could not simulate color blindness",
           message,
         });
       } finally {
@@ -176,8 +176,8 @@ function ColorBlindnessResultView({
       isLoading={isProcessing}
       markdown={
         error
-          ? ["# Could not simulate colour blindness", "", error].join("\n")
-          : "# Simulating colour blindness..."
+          ? ["# Could not simulate color blindness", "", error].join("\n")
+          : "# Simulating color blindness..."
       }
     />
   );
@@ -224,7 +224,7 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
     await Clipboard.copy(result.simulatedColour);
     await showToast({
       style: Toast.Style.Success,
-      title: "Copied Simulated Colour",
+      title: "Copied Simulated Color",
     });
   }
 
@@ -236,16 +236,18 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
         <ActionPanel>
           <Action
             icon={Icon.Clipboard}
-            title="Copy Simulated Colour"
+            title="Copy Simulated Color"
             onAction={copySimulatedColour}
           />
           <Action.CopyToClipboard
-            title="Copy Source Colour"
+            icon={Icon.Clipboard}
+            title="Copy Source Color"
             content={result.colour}
             shortcut={{ modifiers: ["cmd"], key: "b" }}
           />
           {swatchPreview ? (
             <Action.CopyToClipboard
+              icon={Icon.Clipboard}
               title="Copy Simulated Swatch Path"
               content={swatchPreview.simulatedPath}
               shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
@@ -273,12 +275,12 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
       metadata={
         <Detail.Metadata>
           <Detail.Metadata.Label
-            title="Source Colour"
+            title="Source Color"
             text={result.colour}
             icon={{ source: Icon.Circle, tintColor: result.colour }}
           />
           <Detail.Metadata.Label
-            title="Simulated Colour"
+            title="Simulated Color"
             text={result.simulatedColour}
             icon={{
               source: Icon.Circle,
@@ -286,7 +288,7 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
             }}
           />
           <Detail.Metadata.Label
-            title="Colour Blindness Type"
+            title="Color Blindness Type"
             text={getColorBlindnessTypeLabel(result.type)}
           />
         </Detail.Metadata>
@@ -338,7 +340,7 @@ function parseColourOutput(stdout: string): ColorBlindnessCliResult {
     }
   }
 
-  throw new Error("Unexpected colour blindness output from delphitools.");
+  throw new Error("Unexpected color blindness output from delphitools.");
 }
 
 function getInitialColorBlindnessType(

@@ -203,6 +203,7 @@ function ShavianForm({ initialInput }: { initialInput: string }) {
             onAction={copyShavian}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title="Copy Input"
             content={values.input}
             shortcut={{ modifiers: ["cmd"], key: "i" }}
@@ -309,11 +310,13 @@ function GlossDetail({
           <Action.CopyToClipboard
             title="Copy Input"
             content={input}
+            icon={Icon.Clipboard}
             shortcut={{ modifiers: ["cmd"], key: "i" }}
           />
           <Action.CopyToClipboard
             title="Copy Gloss"
             content={glossMarkdown}
+            icon={Icon.Clipboard}
             shortcut={{ modifiers: ["cmd", "shift"], key: "g" }}
           />
         </ActionPanel>

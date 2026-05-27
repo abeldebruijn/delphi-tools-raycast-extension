@@ -111,7 +111,7 @@ function SimulationForm({ isCheckingInstall }: { isCheckingInstall: boolean }) {
         <ActionPanel>
           <Action.SubmitForm<FormValues>
             icon={Icon.Eye}
-            title="Simulate Colour Blindness"
+            title="Simulate Color Blindness"
             onSubmit={async (values) => {
               const imagePath = values.image[0];
 
@@ -150,7 +150,7 @@ function SimulationForm({ isCheckingInstall }: { isCheckingInstall: boolean }) {
 
                 await showToast({
                   style: Toast.Style.Failure,
-                  title: "Could not simulate colour blindness",
+                  title: "Could not simulate color blindness",
                   message,
                 });
               }
@@ -208,11 +208,13 @@ function SimulationDetail({ result }: { result: SimulationResult }) {
             onAction={copyImage}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title="Copy Simulated Image Path"
             content={result.outputPath}
             shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
           />
           <Action.CopyToClipboard
+            icon={Icon.Clipboard}
             title="Copy Original Image Path"
             content={result.inputPath}
             shortcut={{ modifiers: ["cmd"], key: "b" }}
@@ -274,7 +276,7 @@ function SimulationResultView({
         setError(message);
         await showToast({
           style: Toast.Style.Failure,
-          title: "Could not simulate colour blindness",
+          title: "Could not simulate color blindness",
           message,
         });
       }
@@ -296,8 +298,8 @@ function SimulationResultView({
       isLoading={!error}
       markdown={
         error
-          ? ["# Could not simulate colour blindness", "", error].join("\n")
-          : "# Simulating colour blindness..."
+          ? ["# Could not simulate color blindness", "", error].join("\n")
+          : "# Simulating color blindness..."
       }
     />
   );
