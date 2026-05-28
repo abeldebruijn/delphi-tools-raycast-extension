@@ -16,7 +16,7 @@ import {
   DelphitoolsInstallStatusView,
   getDelphitoolsInstallStatus,
 } from "./delphitools-install";
-import { createTempSwatchPng } from "./swatch-png";
+import { createTempSolidSwatchSvg } from "./swatch-png";
 
 const execFileAsync = promisify(execFile);
 
@@ -203,7 +203,7 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
       try {
         const paths = await Promise.all(
           result.colours.map((colour) =>
-            createTempSwatchPng({
+            createTempSolidSwatchSvg({
               colour,
               namespace: SWATCH_NAMESPACE,
             }),

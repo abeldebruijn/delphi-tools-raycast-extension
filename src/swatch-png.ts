@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { deflateSync } from "node:zlib";
 
-export type CreateTempSwatchPngOptions = {
+export type CreateTempSolidSwatchSvgOptions = {
   colour: string;
   namespace: string;
   width?: number;
@@ -29,16 +29,19 @@ const PNG_SIGNATURE = Buffer.from([
 ]);
 const pendingSwatchWrites = new Map<string, Promise<void>>();
 
-export async function createTempSwatchPng({
+export async function createTempSolidSwatchSvg({
   colour,
   namespace,
   width = DEFAULT_SWATCH_WIDTH,
   height = DEFAULT_SWATCH_HEIGHT,
-}: CreateTempSwatchPngOptions): Promise<string> {
+}: CreateTempSolidSwatchSvgOptions): Promise<string> {
   const hex = normaliseHexColour(colour);
   const filePath = getTempSwatchPath({ hex, namespace, width, height });
 
-  await writeTempSwatch(filePath, encodeSolidColourPng({ hex, width, height }));
+  await writeTempSwatch(
+    filePath,
+    Buffer.from(encodeSolidColourSvg({ hex, width, height }), "utf8"),
+  );
 
   return filePath;
 }
@@ -149,7 +152,7 @@ function getTempSwatchPath({
     tmpdir(),
     "delphitools-raycast-extension",
     fileSafeNamespace,
-    `swatch-${width}x${height}-${hex.slice(1)}.png`,
+    `swatch-${width}x${height}-${hex.slice(1)}.svg`,
   );
 }
 
@@ -178,7 +181,7 @@ function getTempTextSwatchPath({
   );
 }
 
-function encodeSolidColourPng({
+function encodeSolidColourSvg({
   hex,
   width,
   height,
@@ -186,14 +189,12 @@ function encodeSolidColourPng({
   hex: string;
   width: number;
   height: number;
-}): Buffer {
-  const [red, green, blue] = hexToRgb(hex);
-
-  return encodeRawPng({
-    raw: createRawImage({ width, height, red, green, blue }),
-    width,
-    height,
-  });
+}): string {
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Swatch ${hex}">`,
+    `  <rect width="100%" height="100%" fill="${hex}"/>`,
+    "</svg>",
+  ].join("\n");
 }
 
 function encodeTextSwatchPng({
