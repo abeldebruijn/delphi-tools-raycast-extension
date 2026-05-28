@@ -4,6 +4,7 @@ import {
   Clipboard,
   Detail,
   Form,
+  Grid,
   Icon,
   showToast,
   Toast,
@@ -49,24 +50,47 @@ type BarcodeResult = {
   scale: number;
 };
 
+type BarcodeFormatOption = {
+  description: string;
+  label: string;
+  value: BarcodeFormat;
+};
+
 const DEFAULT_FORMAT: BarcodeFormat = "code128";
 const DEFAULT_HEIGHT = "120";
 const DEFAULT_SCALE = "2";
 const OUTPUT_NAMESPACE = "barcode";
 const PREVIEW_IMAGE_WIDTH = 420;
 const FORMAT_PREVIEW_DATA = "Raycast";
-const FORMAT_PREVIEW_WIDTH = 280;
-const FORMAT_PREVIEW_HEIGHT = 96;
+const FORMAT_PREVIEW_WIDTH = 520;
+const FORMAT_PREVIEW_HEIGHT = 260;
+const FORMAT_PREVIEW_VERSION = "v2";
 
-const BARCODE_FORMATS: Array<{ label: string; value: BarcodeFormat }> = [
-  { label: "EAN-13", value: "ean13" },
-  { label: "EAN-8", value: "ean8" },
-  { label: "UPC-A", value: "upca" },
-  { label: "Code 39", value: "code39" },
-  { label: "Code 128", value: "code128" },
-  { label: "Codabar", value: "codabar" },
-  { label: "Code 93", value: "code93" },
-  { label: "ITF", value: "itf" },
+const BARCODE_FORMATS: BarcodeFormatOption[] = [
+  { label: "EAN-13", value: "ean13", description: "13-digit retail barcode" },
+  { label: "EAN-8", value: "ean8", description: "8-digit retail barcode" },
+  { label: "UPC-A", value: "upca", description: "12-digit retail barcode" },
+  {
+    label: "Code 39",
+    value: "code39",
+    description: "Uppercase letters, numbers, and symbols",
+  },
+  {
+    label: "Code 128",
+    value: "code128",
+    description: "General-purpose text and numeric data",
+  },
+  {
+    label: "Codabar",
+    value: "codabar",
+    description: "Numeric data with a small symbol set",
+  },
+  {
+    label: "Code 93",
+    value: "code93",
+    description: "Compact alphanumeric barcode",
+  },
+  { label: "ITF", value: "itf", description: "Even-length numeric data" },
 ];
 
 export default function Command() {
@@ -175,8 +199,13 @@ function BarcodeForm({ isCheckingInstall }: { isCheckingInstall: boolean }) {
           {formatPreviewPaths ? (
             <Action.Push
               icon={Icon.Eye}
-              title="Show Format Previews"
-              target={<FormatPreviewDetail previewPaths={formatPreviewPaths} />}
+              title="Show Supported Formats"
+              target={
+                <FormatPreviewGrid
+                  previewPaths={formatPreviewPaths}
+                  onSelectFormat={setFormat}
+                />
+              }
             />
           ) : null}
         </ActionPanel>
@@ -197,12 +226,10 @@ function BarcodeForm({ isCheckingInstall }: { isCheckingInstall: boolean }) {
           />
         ))}
       </Form.Dropdown>
-      {formatPreviewPaths ? (
-        <Form.Description
-          title="Format Previews"
-          text={getFormatPreviewMarkdown(formatPreviewPaths)}
-        />
-      ) : null}
+      <Form.Description
+        title=""
+        text="Use Show Supported Formats to preview all barcode formats."
+      />
       <Form.TextField
         id="height"
         title="Height"
@@ -213,23 +240,49 @@ function BarcodeForm({ isCheckingInstall }: { isCheckingInstall: boolean }) {
   );
 }
 
-function FormatPreviewDetail({
+function FormatPreviewGrid({
+  onSelectFormat,
   previewPaths,
 }: {
+  onSelectFormat: (format: BarcodeFormat) => void;
   previewPaths: Record<BarcodeFormat, string>;
 }) {
+  const { pop } = useNavigation();
+
   return (
-    <Detail
-      markdown={getFormatPreviewMarkdown(previewPaths)}
-      metadata={
-        <Detail.Metadata>
-          <Detail.Metadata.Label
-            title="Preview Value"
-            text={FORMAT_PREVIEW_DATA}
-          />
-        </Detail.Metadata>
-      }
-    />
+    <Grid
+      aspectRatio="16/9"
+      columns={2}
+      fit={Grid.Fit.Contain}
+      inset={Grid.Inset.Medium}
+      searchBarPlaceholder="Search supported barcode formats"
+    >
+      {BARCODE_FORMATS.map((format) => (
+        <Grid.Item
+          key={format.value}
+          content={previewPaths[format.value]}
+          keywords={[format.value, format.description]}
+          title={format.label}
+          subtitle={format.description}
+          actions={
+            <ActionPanel>
+              <Action
+                icon={Icon.CheckCircle}
+                title="Use Format"
+                onAction={() => {
+                  onSelectFormat(format.value);
+                  pop();
+                }}
+              />
+              <Action.CopyToClipboard
+                title="Copy CLI Value"
+                content={format.value}
+              />
+            </ActionPanel>
+          }
+        />
+      ))}
+    </Grid>
   );
 }
 
@@ -397,26 +450,13 @@ async function writeFormatPreviewSvgs(): Promise<
   return Object.fromEntries(entries) as Record<BarcodeFormat, string>;
 }
 
-function getFormatPreviewMarkdown(
-  previewPaths: Record<BarcodeFormat, string>,
-): string {
-  return [
-    "| Name | Image |",
-    "| --- | --- |",
-    ...BARCODE_FORMATS.map(
-      (format) =>
-        `| ${format.label} | <img src="${previewPaths[format.value]}" width="${FORMAT_PREVIEW_WIDTH}" /> |`,
-    ),
-  ].join("\n");
-}
-
 function getFormatPreviewPath(format: BarcodeFormat): string {
   return join(
     tmpdir(),
     "delphitools-raycast-extension",
     OUTPUT_NAMESPACE,
     "format-previews",
-    `${format}-${FORMAT_PREVIEW_DATA.toLowerCase()}.svg`,
+    `${format}-${FORMAT_PREVIEW_DATA.toLowerCase()}-${FORMAT_PREVIEW_VERSION}.svg`,
   );
 }
 
@@ -425,16 +465,16 @@ function getFormatPreviewSvg(format: BarcodeFormat, label: string): string {
   const barShapes = bars
     .map(
       (bar, index) =>
-        `<rect x="${18 + index * 8}" y="${bar.y}" width="${bar.width}" height="${bar.height}" rx="1" fill="#111111" />`,
+        `<rect x="${32 + index * 14}" y="${bar.y}" width="${bar.width}" height="${bar.height}" rx="1.5" fill="#111111" />`,
     )
     .join("");
 
   return `<svg width="${FORMAT_PREVIEW_WIDTH}" height="${FORMAT_PREVIEW_HEIGHT}" viewBox="0 0 ${FORMAT_PREVIEW_WIDTH} ${FORMAT_PREVIEW_HEIGHT}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="${FORMAT_PREVIEW_WIDTH}" height="${FORMAT_PREVIEW_HEIGHT}" rx="8" fill="#ffffff"/>
-  <rect x="0.5" y="0.5" width="${FORMAT_PREVIEW_WIDTH - 1}" height="${FORMAT_PREVIEW_HEIGHT - 1}" rx="7.5" fill="none" stroke="#d8d1bd"/>
-  <text x="18" y="18" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#06490e">${escapeSvgText(label)}</text>
+  <rect width="${FORMAT_PREVIEW_WIDTH}" height="${FORMAT_PREVIEW_HEIGHT}" rx="16" fill="#ffffff"/>
+  <rect x="0.5" y="0.5" width="${FORMAT_PREVIEW_WIDTH - 1}" height="${FORMAT_PREVIEW_HEIGHT - 1}" rx="15.5" fill="none" stroke="#d8d1bd"/>
+  <text x="32" y="40" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#06490e">${escapeSvgText(label)}</text>
   ${barShapes}
-  <text x="${FORMAT_PREVIEW_WIDTH / 2}" y="84" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#111111">${escapeSvgText(FORMAT_PREVIEW_DATA)}</text>
+  <text x="${FORMAT_PREVIEW_WIDTH / 2}" y="226" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#111111">${escapeSvgText(FORMAT_PREVIEW_DATA)}</text>
 </svg>`;
 }
 
@@ -450,13 +490,12 @@ function getFormatPreviewBars(format: BarcodeFormat): Array<{
 
   return Array.from({ length: 30 }, (_, index) => {
     const value = (seed + index * 17 + (index % 5) * 11) % 9;
-    const isGuard = index < 2 || index > 27 || index === 14 || index === 15;
-    const height = isGuard ? 52 : 32 + value * 2;
+    const height = 112;
 
     return {
       height,
-      width: value % 3 === 0 ? 4 : value % 2 === 0 ? 3 : 2,
-      y: 24 + (52 - height),
+      width: value % 3 === 0 ? 8 : value % 2 === 0 ? 6 : 4,
+      y: 86,
     };
   });
 }
