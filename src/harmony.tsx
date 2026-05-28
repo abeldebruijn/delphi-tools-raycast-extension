@@ -9,14 +9,15 @@ import {
   showToast,
   Toast,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { useEffect, useState } from "react";
 
-import { DelphitoolsRequired } from "./delphitools-install";
+import {
+  DelphitoolsInstallStatusView,
+  getDelphitoolsInstallStatus,
+} from "./delphitools-install";
 import { createTempSolidSwatchSvg } from "./swatch-png";
-
-const execFileAsync = promisify(execFile);
+import { hexToRgb, rgbToHex } from "./utils/color";
+import { execFileAsync } from "./utils/exec";
 
 type HarmonyType =
   | "complementary"
@@ -502,27 +503,6 @@ function getHarmonyOffsets(harmonyType: HarmonyType): number[] {
   }
 }
 
-function hexToRgb(hex: string): [number, number, number] | undefined {
-  const normalised = hex.trim().replace(/^#/, "");
-  const full =
-    normalised.length === 3
-      ? normalised
-          .split("")
-          .map((character) => character + character)
-          .join("")
-      : normalised;
-
-  if (!/^[0-9a-fA-F]{6}$/.test(full)) {
-    return undefined;
-  }
-
-  return [
-    Number.parseInt(full.slice(0, 2), 16),
-    Number.parseInt(full.slice(2, 4), 16),
-    Number.parseInt(full.slice(4, 6), 16),
-  ];
-}
-
 function rgbToHsl(
   rgb: readonly [number, number, number],
 ): [number, number, number] {
@@ -587,10 +567,6 @@ function hslToHex(hue: number, saturation: number, lightness: number): string {
     Math.round((green + match) * 255),
     Math.round((blue + match) * 255),
   ]);
-}
-
-function rgbToHex(rgb: readonly [number, number, number]): string {
-  return `#${rgb.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
 }
 
 function rotateHue(hue: number): number {

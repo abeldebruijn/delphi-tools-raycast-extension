@@ -1,3 +1,4 @@
+import { execFileAsync } from "./utils/exec";
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -7,13 +8,12 @@ import {
   showToast,
   Toast,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { useEffect, useRef, useState } from "react";
 
-import { DelphitoolsRequired } from "./delphitools-install";
-
-const execFileAsync = promisify(execFile);
+import {
+  DelphitoolsInstallStatusView,
+  getDelphitoolsInstallStatus,
+} from "./delphitools-install";
 
 type ShadeMode = "classic" | "vivid" | "muted" | "hue-shift";
 

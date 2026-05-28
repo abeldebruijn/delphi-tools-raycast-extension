@@ -1,3 +1,4 @@
+import { execFileAsync } from "./utils/exec";
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -8,14 +9,13 @@ import {
   showToast,
   Toast,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { useEffect, useState } from "react";
 
-import { DelphitoolsRequired } from "./delphitools-install";
+import {
+  DelphitoolsInstallStatusView,
+  getDelphitoolsInstallStatus,
+} from "./delphitools-install";
 import { createTempSolidSwatchSvg, normaliseHexColour } from "./swatch-png";
-
-const execFileAsync = promisify(execFile);
 
 type ColorBlindnessType =
   | "normal"

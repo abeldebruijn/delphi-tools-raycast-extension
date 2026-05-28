@@ -10,14 +10,15 @@ import {
   showToast,
   Toast,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { useEffect, useRef, useState } from "react";
 
-import { DelphitoolsRequired } from "./delphitools-install";
+import {
+  DelphitoolsInstallStatusView,
+  getDelphitoolsInstallStatus,
+} from "./delphitools-install";
 import { createTempTextSwatchSvg } from "./swatch-png";
-
-const execFileAsync = promisify(execFile);
+import { getContrastRatio, hexToRgb, rgbToHex } from "./utils/color";
+import { execFileAsync } from "./utils/exec";
 
 type FormValues = {
   fg: string;
@@ -706,54 +707,4 @@ function getForegroundForRatio(
   }
 
   return rgbToHex(best);
-}
-
-function hexToRgb(hex: string): [number, number, number] | undefined {
-  const normalised = hex.trim().replace(/^#/, "");
-  const full =
-    normalised.length === 3 || normalised.length === 4
-      ? normalised
-          .slice(0, 3)
-          .split("")
-          .map((character) => character + character)
-          .join("")
-      : normalised.slice(0, 6);
-
-  if (!/^[0-9a-fA-F]{6}$/.test(full)) {
-    return undefined;
-  }
-
-  return [
-    Number.parseInt(full.slice(0, 2), 16),
-    Number.parseInt(full.slice(2, 4), 16),
-    Number.parseInt(full.slice(4, 6), 16),
-  ];
-}
-
-function rgbToHex(rgb: readonly [number, number, number]): string {
-  return `#${rgb
-    .map((channel) => channel.toString(16).padStart(2, "0"))
-    .join("")}`;
-}
-
-function getContrastRatio(
-  foreground: readonly [number, number, number],
-  background: readonly [number, number, number],
-): number {
-  const foregroundLuminance = getRelativeLuminance(foreground);
-  const backgroundLuminance = getRelativeLuminance(background);
-  const lighter = Math.max(foregroundLuminance, backgroundLuminance);
-  const darker = Math.min(foregroundLuminance, backgroundLuminance);
-
-  return (lighter + 0.05) / (darker + 0.05);
-}
-
-function getRelativeLuminance(rgb: readonly [number, number, number]): number {
-  const [red, green, blue] = rgb.map((channel) => {
-    const value = channel / 255;
-
-    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-  });
-
-  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
 }

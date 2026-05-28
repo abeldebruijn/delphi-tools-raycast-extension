@@ -1,3 +1,4 @@
+import { execFileAsync } from "./utils/exec";
 import {
   Action,
   ActionPanel,
@@ -9,16 +10,12 @@ import {
   Toast,
   useNavigation,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
 import { mkdir, mkdtemp, readdir, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { promisify } from "node:util";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { DelphitoolsRequired } from "./delphitools-install";
-
-const execFileAsync = promisify(execFile);
 
 type RatioPreset = "4:5" | "1:1" | "16:9" | "custom";
 type FillMode = "blur" | "colour";

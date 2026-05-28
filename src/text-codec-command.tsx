@@ -1,3 +1,4 @@
+import { execFileAsync } from "./utils/exec";
 import {
   Action,
   ActionPanel,
@@ -8,13 +9,12 @@ import {
   showToast,
   Toast,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { useEffect, useRef, useState } from "react";
 
-import { DelphitoolsRequired } from "./delphitools-install";
-
-const execFileAsync = promisify(execFile);
+import {
+  DelphitoolsInstallStatusView,
+  getDelphitoolsInstallStatus,
+} from "./delphitools-install";
 
 type CodecOperation = "encode" | "decode";
 type Encoding = "base64" | "url";

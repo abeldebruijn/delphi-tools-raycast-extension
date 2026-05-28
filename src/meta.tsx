@@ -1,3 +1,4 @@
+import { execFileAsync } from "./utils/exec";
 import {
   Action,
   ActionPanel,
@@ -9,13 +10,13 @@ import {
   Toast,
   useNavigation,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { DelphitoolsRequired } from "./delphitools-install";
+import {
+  DelphitoolsInstallStatusView,
+  getDelphitoolsInstallStatus,
+} from "./delphitools-install";
 
-const execFileAsync = promisify(execFile);
 const TITLE_LIMIT = 60;
 const DESCRIPTION_LIMIT = 160;
 

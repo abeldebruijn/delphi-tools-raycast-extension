@@ -1,11 +1,8 @@
-import { execFile } from "node:child_process";
+import { execFileAsync } from "./utils/exec";
 import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { promisify } from "node:util";
-
-const execFileAsync = promisify(execFile);
 
 export type QrErrorLevel = "L" | "M" | "Q" | "H";
 

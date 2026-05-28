@@ -1,3 +1,4 @@
+import { execFileAsync } from "./utils/exec";
 import {
   Action,
   ActionPanel,
@@ -9,13 +10,10 @@ import {
   Toast,
   useNavigation,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
 import path from "node:path";
-import { promisify } from "node:util";
 
 import { DelphitoolsRequired } from "./delphitools-install";
 
-const execFileAsync = promisify(execFile);
 const SUPPORTED_EXTENSIONS = new Set([".ttf", ".otf", ".woff", ".woff2"]);
 const SUMMARY_KEYS = [
   "family",

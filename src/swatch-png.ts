@@ -3,6 +3,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { deflateSync } from "node:zlib";
 
+import { hexToRgbOrThrow } from "./utils/color";
+
 export type CreateTempSolidSwatchSvgOptions = {
   colour: string;
   namespace: string;
@@ -209,7 +211,7 @@ function encodeTextSwatchPng({
   height: number;
 }): Buffer {
   const [backgroundRed, backgroundGreen, backgroundBlue] =
-    hexToRgb(backgroundHex);
+    hexToRgbOrThrow(backgroundHex);
   const raw = createRawImage({
     width,
     height,
@@ -217,7 +219,7 @@ function encodeTextSwatchPng({
     green: backgroundGreen,
     blue: backgroundBlue,
   });
-  const foregroundRgb = hexToRgb(foregroundHex);
+  const foregroundRgb = hexToRgbOrThrow(foregroundHex);
   const x = Math.max(24, Math.round(width * 0.05));
   const y = Math.max(32, Math.round(height * 0.26));
 
@@ -352,16 +354,6 @@ function crc32(buffer: Buffer): number {
   }
 
   return (crc ^ 0xffffffff) >>> 0;
-}
-
-function hexToRgb(colour: string): [number, number, number] {
-  const hex = normaliseHexColour(colour).slice(1);
-
-  return [
-    Number.parseInt(hex.slice(0, 2), 16),
-    Number.parseInt(hex.slice(2, 4), 16),
-    Number.parseInt(hex.slice(4, 6), 16),
-  ];
 }
 
 function drawText(

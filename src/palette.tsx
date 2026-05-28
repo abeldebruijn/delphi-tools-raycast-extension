@@ -1,3 +1,4 @@
+import { execFileAsync } from "./utils/exec";
 import {
   Action,
   ActionPanel,
@@ -10,16 +11,15 @@ import {
   Toast,
   useNavigation,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { promisify } from "node:util";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { DelphitoolsRequired } from "./delphitools-install";
+import {
+  DelphitoolsInstallStatusView,
+  getDelphitoolsInstallStatus,
+} from "./delphitools-install";
 import { createTempSolidSwatchSvg } from "./swatch-png";
-
-const execFileAsync = promisify(execFile);
 
 type PaletteColor = {
   hex: string;

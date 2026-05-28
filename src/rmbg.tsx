@@ -1,3 +1,4 @@
+import { execFileAsync } from "./utils/exec";
 import {
   Action,
   ActionPanel,
@@ -10,16 +11,15 @@ import {
   Toast,
   useNavigation,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
 import { mkdir, readdir, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { promisify } from "node:util";
 import { useEffect, useState } from "react";
 
-import { DelphitoolsRequired } from "./delphitools-install";
-
-const execFileAsync = promisify(execFile);
+import {
+  DelphitoolsInstallStatusView,
+  getDelphitoolsInstallStatus,
+} from "./delphitools-install";
 
 type FormValues = {
   images: string[];
@@ -82,7 +82,8 @@ function RmbgForm({ isCheckingInstall }: { isCheckingInstall: boolean }) {
               }
 
               try {
-                const hasRunBefore = await LocalStorage.getItem<boolean>(FIRST_RUN_KEY);
+                const hasRunBefore =
+                  await LocalStorage.getItem<boolean>(FIRST_RUN_KEY);
                 const toastTitle = hasRunBefore
                   ? "Removing background..."
                   : "Removing background (Downloading model on first run)...";
@@ -183,16 +184,8 @@ function RmbgActions({
 
   return (
     <ActionPanel>
-      <Action.Open
-        icon={Icon.Eye}
-        title="Open Image"
-        target={outputPath}
-      />
-      <Action
-        icon={Icon.Clipboard}
-        title="Copy Image"
-        onAction={copyImage}
-      />
+      <Action.Open icon={Icon.Eye} title="Open Image" target={outputPath} />
+      <Action icon={Icon.Clipboard} title="Copy Image" onAction={copyImage} />
       <Action.CopyToClipboard
         title="Copy Image Path"
         content={outputPath}

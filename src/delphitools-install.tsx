@@ -1,9 +1,8 @@
 import { Action, ActionPanel, Detail, Icon } from "@raycast/api";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { ReactNode, useEffect, useState } from "react";
 
-const execFileAsync = promisify(execFile);
+import { execFileAsync } from "./utils/exec";
+
 const INSTALL_COMMAND = "cargo install delphitools-cli";
 
 type DelphitoolsInstallStatus =

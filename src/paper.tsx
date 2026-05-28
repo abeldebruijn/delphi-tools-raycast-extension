@@ -1,3 +1,4 @@
+import { execFileAsync } from "./utils/exec";
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -10,16 +11,15 @@ import {
   showToast,
   Toast,
 } from "@raycast/api";
-import { execFile } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { promisify } from "node:util";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { DelphitoolsRequired } from "./delphitools-install";
-
-const execFileAsync = promisify(execFile);
+import {
+  DelphitoolsInstallStatusView,
+  getDelphitoolsInstallStatus,
+} from "./delphitools-install";
 
 type PaperSeries = "all" | "a" | "b" | "c" | "us";
 type PaperUnit = "mm" | "in" | "pt";
