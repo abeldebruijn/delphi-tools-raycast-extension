@@ -4,8 +4,6 @@ Run local design and text utilities from [delphitools](https://tools.rmv.fyi/) i
 
 ## Commands
 
-- Check Delphitools Install
-- Delphitools
 - Encode Text
 - Decode Text
 - Hash Text
@@ -34,8 +32,6 @@ This extension uses the local `delphitools` CLI. Install it before running comma
 ```sh
 cargo install delphitools-cli
 ```
-
-After installation, run `Check Delphitools Install` in Raycast to confirm the CLI is available on your `PATH`.
 
 ## Requirements
 

@@ -27,18 +27,6 @@
   "commands": [
     {
       "mode": "view",
-      "name": "check-delphitools-install",
-      "title": "Check Delphitools Install",
-      "description": "Check whether delphitools is installed"
-    },
-    {
-      "mode": "view",
-      "name": "delphi-tools",
-      "title": "Delphitools",
-      "description": "Wrapper for delphitools"
-    },
-    {
-      "mode": "view",
       "name": "encode",
       "title": "Encode Text",
       "description": "Encode text as base64 or URL encoding",
