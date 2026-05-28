@@ -430,6 +430,111 @@
           "required": false
         }
       ]
+    },
+    {
+      "mode": "view",
+      "name": "noise",
+      "title": "Add Noise to Images",
+      "description": "Add color noise overlay to images",
+      "icon": "noise-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "palette",
+      "title": "Palette Generator",
+      "description": "Generate color palettes using various strategies",
+      "icon": "palette-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "preflight",
+      "title": "PDF Preflight",
+      "description": "Analyze PDF for print-readiness issues",
+      "icon": "preflight-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "qr",
+      "title": "QR Code Generator",
+      "description": "Generate styled QR codes",
+      "icon": "qr-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "qr-vcard",
+      "title": "QR Code Generator VCard",
+      "description": "Generate styled vCard QR codes",
+      "icon": "qr-vcard-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "regex",
+      "title": "Regex Tester",
+      "description": "Test regex patterns against text",
+      "icon": "regex-icon.svg",
+      "arguments": [
+        {
+          "name": "pattern",
+          "placeholder": "Pattern",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "text",
+          "placeholder": "Text",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "mode": "view",
+      "name": "rmbg",
+      "title": "Background Remover",
+      "description": "Remove background from images",
+      "icon": "rmbg-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "scroll",
+      "title": "Seamless Scroll Generator",
+      "description": "Split images for Instagram carousel scrolls",
+      "icon": "scroll-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "split",
+      "title": "Image Splitter",
+      "description": "Split an image into a grid of tiles",
+      "icon": "split-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "svgo",
+      "title": "SVG Optimiser",
+      "description": "Optimise and minify SVG files",
+      "icon": "svgo-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "trace",
+      "title": "Image Tracer",
+      "description": "Trace raster images to SVG vectors",
+      "icon": "trace-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "watermark",
+      "title": "Watermarker",
+      "description": "Composite a watermark onto images",
+      "icon": "watermark-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "zine",
+      "title": "Zine Imposer",
+      "description": "Impose 8 images into a single-sheet mini-zine layout",
+      "icon": "zine-icon.svg"
     }
   ],
   "title": "Delphitools",

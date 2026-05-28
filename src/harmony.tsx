@@ -5,6 +5,7 @@ import {
   Clipboard,
   Detail,
   Icon,
+  Keyboard,
   showToast,
   Toast,
 } from "@raycast/api";
@@ -274,7 +275,10 @@ function HarmonyDetail({ result }: { result: HarmonyResult }) {
               content={colour}
               shortcut={
                 index < 9
-                  ? { modifiers: ["cmd"], key: String(index + 1) }
+                  ? {
+                      modifiers: ["cmd"],
+                      key: String(index + 1) as Keyboard.KeyEquivalent,
+                    }
                   : undefined
               }
             />
