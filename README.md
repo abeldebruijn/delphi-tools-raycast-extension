@@ -18,6 +18,9 @@ Run local design and text utilities from [delphitools](https://tools.rmv.fyi/) i
 - Convert Images
 - Favicon Generator
 - Social Media Cropper
+- Print Imposer
+- Matte Generator
+- Meta Tag Generator
 - Generate Tailwind Shades
 - Compute Line Height
 - Paper Sizes

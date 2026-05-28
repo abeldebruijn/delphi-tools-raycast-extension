@@ -333,6 +333,27 @@
     },
     {
       "mode": "view",
+      "name": "impose",
+      "title": "Print Imposer",
+      "description": "Impose a PDF for booklet or n-up printing",
+      "icon": "impose-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "matte",
+      "title": "Matte Generator",
+      "description": "Place images on a square or aspect-ratio matte",
+      "icon": "matte-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "meta",
+      "title": "Meta Tag Generator",
+      "description": "Generate HTML meta tags",
+      "icon": "meta-icon.svg"
+    },
+    {
+      "mode": "view",
       "name": "tailwind-shades",
       "title": "Generate Tailwind Shades",
       "description": "Generate Tailwind CSS color shades from a base color",

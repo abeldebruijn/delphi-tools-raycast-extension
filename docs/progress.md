@@ -6,9 +6,9 @@ Hardness estimates are for wrapping each `delphitools` command as a Raycast comm
 
 | Tool                                        | Extension hardness | Raycast ease | Progress    |
 | ------------------------------------------- | ------------------ | ------------ | ----------- |
-| [impose](./delphitools/impose.md)           | Hard               | Moderate     | Not started |
-| [matte](./delphitools/matte.md)             | Moderate           | Moderate     | Not started |
-| [meta](./delphitools/meta.md)               | Easy               | Easy         | Not started |
+| [crop](./delphitools/crop.md)               | Moderate           | Moderate     | Not started |
+| [favicon](./delphitools/favicon.md)         | Moderate           | Moderate     | Not started |
+| [font-info](./delphitools/font-info.md)     | Moderate           | Moderate     | Not started |
 | [noise](./delphitools/noise.md)             | Moderate           | Moderate     | Not started |
 | [palette](./delphitools/palette.md)         | Moderate           | Easy         | Not started |
 | [preflight](./delphitools/preflight.md)     | Hard               | Moderate     | Not started |
@@ -42,6 +42,9 @@ Hardness estimates are for wrapping each `delphitools` command as a Raycast comm
 | [convert](./delphitools/convert.md)                 | Implemented as a batch image file-picker Form that converts to png, jpeg, jpg, webp, gif, tiff, bmp, or ico with quality and optional resize controls, temporary output List results, and open/copy/reveal actions                                                                   |
 | [crop](./delphitools/crop.md)                       | Implemented as a batch image file-picker Form that crops to a shared ratio and position, writes to a temporary output directory, and shows List results with open, copy-image, copy-path, copy-all-paths, and reveal actions                                                         |
 | [favicon](./delphitools/favicon.md)                 | Implemented as a single-image Form that generates configured favicon sizes and optional favicon.ico into a temporary output directory with open, copy-file, copy-path, copy-all-paths, and reveal actions                                                                            |
+| [impose](./delphitools/impose.md)                   | Implemented as a PDF file-picker Form for `saddle-stitch`, `perfect-bind`, and `n-up` layouts with paper, n-up, signature, margin, gutter, creep, crop-mark, and duplex controls; writes a temporary imposed PDF with preview, open, copy-file, copy-path, and reveal actions        |
+| [matte](./delphitools/matte.md)                     | Implemented as a batch image file-picker Form with blur, solid, and gradient styles; `1:1`, `4:5`, `3:4`, `9:16`, and custom ratio support; writes temporary matted images with open, copy-image, copy-path, copy-all-paths, and reveal actions                                      |
+| [meta](./delphitools/meta.md)                       | Implemented as a live metadata Form with title and description character-count guidance, optional URL/image/page type/site name/author/Twitter handle fields, copy meta tags action, and preview Detail                                                                              |
 | [tailwind shades](./delphitools/tailwind-shades.md) | Implemented as a required base-colour Command argument with optional classic/vivid/muted/hue-shift mode, direct swatch List output, per-shade copy actions, and CSS variable, OKLCH variable, Tailwind config, and shade-scale copy actions                                          |
 
 ## Not planned (already in Raycast core)
