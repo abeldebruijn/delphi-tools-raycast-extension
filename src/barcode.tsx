@@ -12,7 +12,7 @@ import {
 } from "@raycast/api";
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { promisify } from "node:util";
@@ -53,6 +53,7 @@ type BarcodeResult = {
 type BarcodeFormatOption = {
   description: string;
   label: string;
+  previewData: string;
   value: BarcodeFormat;
 };
 
@@ -61,36 +62,57 @@ const DEFAULT_HEIGHT = "120";
 const DEFAULT_SCALE = "2";
 const OUTPUT_NAMESPACE = "barcode";
 const PREVIEW_IMAGE_WIDTH = 420;
-const FORMAT_PREVIEW_DATA = "Raycast";
-const FORMAT_PREVIEW_WIDTH = 520;
-const FORMAT_PREVIEW_HEIGHT = 260;
-const FORMAT_PREVIEW_VERSION = "v2";
+const FORMAT_PREVIEW_VERSION = "v3";
 
 const BARCODE_FORMATS: BarcodeFormatOption[] = [
-  { label: "EAN-13", value: "ean13", description: "13-digit retail barcode" },
-  { label: "EAN-8", value: "ean8", description: "8-digit retail barcode" },
-  { label: "UPC-A", value: "upca", description: "12-digit retail barcode" },
+  {
+    label: "EAN-13",
+    value: "ean13",
+    description: "13-digit retail barcode",
+    previewData: "123456789101",
+  },
+  {
+    label: "EAN-8",
+    value: "ean8",
+    description: "8-digit retail barcode",
+    previewData: "1234567",
+  },
+  {
+    label: "UPC-A",
+    value: "upca",
+    description: "12-digit retail barcode",
+    previewData: "12345678910",
+  },
   {
     label: "Code 39",
     value: "code39",
     description: "Uppercase letters, numbers, and symbols",
+    previewData: "RAYCAST",
   },
   {
     label: "Code 128",
     value: "code128",
     description: "General-purpose text and numeric data",
+    previewData: "Raycast",
   },
   {
     label: "Codabar",
     value: "codabar",
     description: "Numeric data with a small symbol set",
+    previewData: "A123456A",
   },
   {
     label: "Code 93",
     value: "code93",
     description: "Compact alphanumeric barcode",
+    previewData: "RAYCAST",
   },
-  { label: "ITF", value: "itf", description: "Even-length numeric data" },
+  {
+    label: "ITF",
+    value: "itf",
+    description: "Even-length numeric data",
+    previewData: "12345678",
+  },
 ];
 
 export default function Command() {
@@ -123,7 +145,7 @@ function BarcodeForm({ isCheckingInstall }: { isCheckingInstall: boolean }) {
 
   useEffect(() => {
     async function loadFormatPreviews() {
-      setFormatPreviewPaths(await writeFormatPreviewSvgs());
+      setFormatPreviewPaths(await writeFormatPreviewImages());
     }
 
     loadFormatPreviews();
@@ -157,6 +179,17 @@ function BarcodeForm({ isCheckingInstall }: { isCheckingInstall: boolean }) {
         style: Toast.Style.Failure,
         title: "Invalid barcode settings",
         message: scale.message,
+      });
+      return;
+    }
+
+    const dataValidation = validateBarcodeData(data, values.format);
+
+    if (dataValidation instanceof Error) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: `Invalid ${getFormatLabel(values.format)} data`,
+        message: dataValidation.message,
       });
       return;
     }
@@ -263,7 +296,7 @@ function FormatPreviewGrid({
           content={previewPaths[format.value]}
           keywords={[format.value, format.description]}
           title={format.label}
-          subtitle={format.description}
+          subtitle={`${format.description} · ${format.previewData}`}
           actions={
             <ActionPanel>
               <Action
@@ -409,6 +442,45 @@ function parsePositiveInteger(value: string, label: string): number | Error {
   return parsed;
 }
 
+function validateBarcodeData(
+  data: string,
+  format: BarcodeFormat,
+): true | Error {
+  switch (format) {
+    case "ean13":
+      return /^\d{12}$/.test(data)
+        ? true
+        : new Error("EAN-13 requires exactly 12 digits. Example: 123456789101");
+    case "ean8":
+      return /^\d{7}$/.test(data)
+        ? true
+        : new Error("EAN-8 requires exactly 7 digits. Example: 1234567");
+    case "upca":
+      return /^\d{11}$/.test(data)
+        ? true
+        : new Error("UPC-A requires exactly 11 digits. Example: 12345678910");
+    case "code39":
+      return /^[A-Z0-9 \-.$/+%]+$/.test(data)
+        ? true
+        : new Error(
+            "Code 39 accepts uppercase letters, numbers, spaces, and - . $ / + %. Example: RAYCAST",
+          );
+    case "codabar":
+      return /^[ABCD][0-9\-$:/.+]+[ABCD]$/.test(data)
+        ? true
+        : new Error(
+            "Codabar must start and end with A, B, C, or D, with numbers and - $ : / . + between. Example: A123456A",
+          );
+    case "itf":
+      return /^\d+$/.test(data) && data.length % 2 === 0
+        ? true
+        : new Error("ITF requires an even number of digits. Example: 12345678");
+    case "code93":
+    case "code128":
+      return true;
+  }
+}
+
 function getFormatLabel(format: BarcodeFormat): string {
   return (
     BARCODE_FORMATS.find((option) => option.value === format)?.label ?? format
@@ -429,19 +501,27 @@ function getDetailMarkdown(result: BarcodeResult): string {
   ].join("\n");
 }
 
-async function writeFormatPreviewSvgs(): Promise<
+async function writeFormatPreviewImages(): Promise<
   Record<BarcodeFormat, string>
 > {
   const entries = await Promise.all(
     BARCODE_FORMATS.map(async (format) => {
-      const outputPath = getFormatPreviewPath(format.value);
+      const outputPath = getFormatPreviewPath(format);
 
       await mkdir(dirname(outputPath), { recursive: true });
-      await writeFile(
+      await execFileAsync("delphitools", [
+        "barcode",
+        "--quiet",
+        "--format",
+        format.value,
+        "--height",
+        "120",
+        "--scale",
+        "2",
+        "--output",
         outputPath,
-        getFormatPreviewSvg(format.value, format.label),
-        "utf8",
-      );
+        format.previewData,
+      ]);
 
       return [format.value, outputPath] as const;
     }),
@@ -450,60 +530,12 @@ async function writeFormatPreviewSvgs(): Promise<
   return Object.fromEntries(entries) as Record<BarcodeFormat, string>;
 }
 
-function getFormatPreviewPath(format: BarcodeFormat): string {
+function getFormatPreviewPath(format: BarcodeFormatOption): string {
   return join(
     tmpdir(),
     "delphitools-raycast-extension",
     OUTPUT_NAMESPACE,
     "format-previews",
-    `${format}-${FORMAT_PREVIEW_DATA.toLowerCase()}-${FORMAT_PREVIEW_VERSION}.svg`,
+    `${format.value}-${format.previewData.toLowerCase()}-${FORMAT_PREVIEW_VERSION}.png`,
   );
-}
-
-function getFormatPreviewSvg(format: BarcodeFormat, label: string): string {
-  const bars = getFormatPreviewBars(format);
-  const barShapes = bars
-    .map(
-      (bar, index) =>
-        `<rect x="${32 + index * 14}" y="${bar.y}" width="${bar.width}" height="${bar.height}" rx="1.5" fill="#111111" />`,
-    )
-    .join("");
-
-  return `<svg width="${FORMAT_PREVIEW_WIDTH}" height="${FORMAT_PREVIEW_HEIGHT}" viewBox="0 0 ${FORMAT_PREVIEW_WIDTH} ${FORMAT_PREVIEW_HEIGHT}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="${FORMAT_PREVIEW_WIDTH}" height="${FORMAT_PREVIEW_HEIGHT}" rx="16" fill="#ffffff"/>
-  <rect x="0.5" y="0.5" width="${FORMAT_PREVIEW_WIDTH - 1}" height="${FORMAT_PREVIEW_HEIGHT - 1}" rx="15.5" fill="none" stroke="#d8d1bd"/>
-  <text x="32" y="40" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#06490e">${escapeSvgText(label)}</text>
-  ${barShapes}
-  <text x="${FORMAT_PREVIEW_WIDTH / 2}" y="226" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#111111">${escapeSvgText(FORMAT_PREVIEW_DATA)}</text>
-</svg>`;
-}
-
-function getFormatPreviewBars(format: BarcodeFormat): Array<{
-  height: number;
-  width: number;
-  y: number;
-}> {
-  const seed = Array.from(`${format}:${FORMAT_PREVIEW_DATA}`).reduce(
-    (total, character) => total + character.charCodeAt(0),
-    0,
-  );
-
-  return Array.from({ length: 30 }, (_, index) => {
-    const value = (seed + index * 17 + (index % 5) * 11) % 9;
-    const height = 112;
-
-    return {
-      height,
-      width: value % 3 === 0 ? 8 : value % 2 === 0 ? 6 : 4,
-      y: 86,
-    };
-  });
-}
-
-function escapeSvgText(text: string): string {
-  return text
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
 }
