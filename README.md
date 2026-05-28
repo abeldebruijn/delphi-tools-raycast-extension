@@ -16,9 +16,12 @@ Run local design and text utilities from [delphitools](https://tools.rmv.fyi/) i
 - Generate Barcode
 - Trim Transparent Edges
 - Convert Images
+- Favicon Generator
+- Social Media Cropper
 - Generate Tailwind Shades
 - Compute Line Height
 - Paper Sizes
+- Font File Explorer
 - Transliterate to Shavian
 
 ## Setup

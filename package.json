@@ -319,6 +319,20 @@
     },
     {
       "mode": "view",
+      "name": "favicon",
+      "title": "Favicon Generator",
+      "description": "Generate multi-size favicon files from an image",
+      "icon": "favicon-icon.svg"
+    },
+    {
+      "mode": "view",
+      "name": "crop",
+      "title": "Social Media Cropper",
+      "description": "Crop images to a social media aspect ratio",
+      "icon": "crop-icon.svg"
+    },
+    {
+      "mode": "view",
       "name": "tailwind-shades",
       "title": "Generate Tailwind Shades",
       "description": "Generate Tailwind CSS color shades from a base color",
@@ -385,6 +399,13 @@
           "required": false
         }
       ]
+    },
+    {
+      "mode": "view",
+      "name": "font-info",
+      "title": "Font File Explorer",
+      "description": "Inspect metadata from TTF, OTF, WOFF, or WOFF2 font files",
+      "icon": "font-info-icon.svg"
     },
     {
       "mode": "view",

@@ -1,0 +1,41 @@
+<svg
+  width="512"
+  height="512"
+  viewBox="0 0 512 512"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <rect width="512" height="512" rx="128" fill="url(#font-info-gradient)" />
+  <path
+    d="M144 374L224 152H292L372 374H318L302 328H214L198 374H144Z"
+    fill="#06490E"
+  />
+  <path d="M228 286H288L260 196H256L228 286Z" fill="#FAF5E6" />
+  <circle cx="360" cy="150" r="46" fill="#FAF5E6" stroke="#06490E" stroke-width="20" />
+  <path
+    d="M360 132V154"
+    stroke="#06490E"
+    stroke-width="16"
+    stroke-linecap="round"
+  />
+  <path
+    d="M360 174V176"
+    stroke="#06490E"
+    stroke-width="16"
+    stroke-linecap="round"
+  />
+  <defs>
+    <radialGradient
+      id="font-info-gradient"
+      cx="0"
+      cy="0"
+      r="1"
+      gradientUnits="userSpaceOnUse"
+      gradientTransform="matrix(512 0 0 512 256 256)"
+    >
+      <stop offset="0" stop-color="#FAF5E6" />
+      <stop offset="0.9" stop-color="#E7DBBB" />
+      <stop offset="1" stop-color="#E7DBBB" />
+    </radialGradient>
+  </defs>
+</svg>

@@ -6,9 +6,6 @@ Hardness estimates are for wrapping each `delphitools` command as a Raycast comm
 
 | Tool                                        | Extension hardness | Raycast ease | Progress    |
 | ------------------------------------------- | ------------------ | ------------ | ----------- |
-| [crop](./delphitools/crop.md)               | Moderate           | Moderate     | Not started |
-| [favicon](./delphitools/favicon.md)         | Moderate           | Moderate     | Not started |
-| [font-info](./delphitools/font-info.md)     | Moderate           | Moderate     | Not started |
 | [impose](./delphitools/impose.md)           | Hard               | Moderate     | Not started |
 | [matte](./delphitools/matte.md)             | Moderate           | Moderate     | Not started |
 | [meta](./delphitools/meta.md)               | Easy               | Easy         | Not started |
@@ -38,10 +35,13 @@ Hardness estimates are for wrapping each `delphitools` command as a Raycast comm
 | [line-height](./delphitools/line-height.md)         | Implemented as a List of named ratios for the active font size with persisted font size, recent font sizes, and copy actions                                                                                                                                                         |
 | [shavian](./delphitools/shavian.md)                 | Implemented as a live text Form with argument, selected-text, then clipboard input precedence; debounced transliteration, optional JSON gloss preview, copy actions, and gloss markdown export                                                                                       |
 | [paper](./delphitools/paper.md)                     | Implemented as a searchable paper-size List for A, B, C, and US series with mm/in/pt units, DPI-aware pixel dimensions, copy actions, and a compare Detail with a local SVG preview                                                                                                  |
+| [font-info](./delphitools/font-info.md)             | Implemented as a single font file-picker Form for TTF, OTF, WOFF, and WOFF2 files with structured metadata Detail, copy JSON, copy summary, and reveal actions                                                                                                                       |
 | [colorblind image](./delphitools/colorblind.md)     | Implemented as a file-picker Form that writes a temporary simulated image preview with open, copy-image, copy-path, and switch-mode actions for all nine colour blindness modes; defaults to deuteranopia                                                                            |
 | [barcode](./delphitools/barcode.md)                 | Implemented as a Form that generates a temporary barcode PNG with format, height, and scale controls; supports ean13, ean8, upca, code39, code128, codabar, code93, and itf; text labels are omitted until CLI font support is available                                             |
 | [clip](./delphitools/clip.md)                       | Implemented as a batch PNG file-picker Form that trims transparent edges into a temporary output directory with List results, open, copy-image, copy-path, copy-all-paths, and reveal actions                                                                                        |
 | [convert](./delphitools/convert.md)                 | Implemented as a batch image file-picker Form that converts to png, jpeg, jpg, webp, gif, tiff, bmp, or ico with quality and optional resize controls, temporary output List results, and open/copy/reveal actions                                                                   |
+| [crop](./delphitools/crop.md)                       | Implemented as a batch image file-picker Form that crops to a shared ratio and position, writes to a temporary output directory, and shows List results with open, copy-image, copy-path, copy-all-paths, and reveal actions                                                         |
+| [favicon](./delphitools/favicon.md)                 | Implemented as a single-image Form that generates configured favicon sizes and optional favicon.ico into a temporary output directory with open, copy-file, copy-path, copy-all-paths, and reveal actions                                                                            |
 | [tailwind shades](./delphitools/tailwind-shades.md) | Implemented as a required base-colour Command argument with optional classic/vivid/muted/hue-shift mode, direct swatch List output, per-shade copy actions, and CSS variable, OKLCH variable, Tailwind config, and shade-scale copy actions                                          |
 
 ## Not planned (already in Raycast core)
