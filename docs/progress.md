@@ -4,20 +4,8 @@ Hardness estimates are for wrapping each `delphitools` command as a Raycast comm
 
 ## Not started
 
-| Tool                                        | Extension hardness | Raycast ease | Progress    |
-| ------------------------------------------- | ------------------ | ------------ | ----------- |
-| [noise](./delphitools/noise.md)             | Moderate           | Moderate     | Not started |
-| [palette](./delphitools/palette.md)         | Moderate           | Easy         | Not started |
-| [preflight](./delphitools/preflight.md)     | Hard               | Moderate     | Not started |
-| [qr](./delphitools/qr.md)                   | Moderate           | Easy         | Not started |
-| [regex](./delphitools/regex.md)             | Easy               | Easy         | Not started |
-| [remove background](./delphitools/rmbg.md)  | Hard               | Moderate     | Not started |
-| [scroll](./delphitools/scroll.md)           | Hard               | Moderate     | Not started |
-| [split](./delphitools/split.md)             | Moderate           | Moderate     | Not started |
-| [optimise SVG files](./delphitools/svgo.md) | Moderate           | Moderate     | Not started |
-| [trace](./delphitools/trace.md)             | Hard               | Moderate     | Not started |
-| [watermark](./delphitools/watermark.md)     | Moderate           | Moderate     | Not started |
-| [zine](./delphitools/zine.md)               | Hard               | Moderate     | Not started |
+None! All planned tools are implemented.
+
 
 ## Implemented
 
@@ -34,6 +22,7 @@ Hardness estimates are for wrapping each `delphitools` command as a Raycast comm
 | [paper](./delphitools/paper.md)                     | Implemented as a searchable paper-size List for A, B, C, and US series with mm/in/pt units, DPI-aware pixel dimensions, copy actions, and a compare Detail with a local SVG preview                                                                                                  |
 | [font-info](./delphitools/font-info.md)             | Implemented as a single font file-picker Form for TTF, OTF, WOFF, and WOFF2 files with structured metadata Detail, copy JSON, copy summary, and reveal actions                                                                                                                       |
 | [colorblind image](./delphitools/colorblind.md)     | Implemented as a file-picker Form that writes a temporary simulated image preview with open, copy-image, copy-path, and switch-mode actions for all nine colour blindness modes; defaults to deuteranopia                                                                            |
+| [qr](./delphitools/qr.md)                           | Implemented as two commands: QR Code Generator (Forms with input seeding, size/color settings, optional logo file picker) and QR Code Generator vCard (form for vCard contacts, locally compiled vCard 3.0 string, generated QR code) with a Detail preview, open/copy/reveal actions |
 | [barcode](./delphitools/barcode.md)                 | Implemented as a Form that generates a temporary barcode PNG with format, height, and scale controls; supports ean13, ean8, upca, code39, code128, codabar, code93, and itf; text labels are omitted until CLI font support is available                                             |
 | [clip](./delphitools/clip.md)                       | Implemented as a batch PNG file-picker Form that trims transparent edges into a temporary output directory with List results, open, copy-image, copy-path, copy-all-paths, and reveal actions                                                                                        |
 | [convert](./delphitools/convert.md)                 | Implemented as a batch image file-picker Form that converts to png, jpeg, jpg, webp, gif, tiff, bmp, or ico with quality and optional resize controls, temporary output List results, and open/copy/reveal actions                                                                   |
@@ -42,7 +31,18 @@ Hardness estimates are for wrapping each `delphitools` command as a Raycast comm
 | [impose](./delphitools/impose.md)                   | Implemented as a PDF file-picker Form for `saddle-stitch`, `perfect-bind`, and `n-up` layouts with paper, n-up, signature, margin, gutter, creep, crop-mark, and duplex controls; writes a temporary imposed PDF with preview, open, copy-file, copy-path, and reveal actions        |
 | [matte](./delphitools/matte.md)                     | Implemented as a batch image file-picker Form with blur, solid, and gradient styles; `1:1`, `4:5`, `3:4`, `9:16`, and custom ratio support; writes temporary matted images with open, copy-image, copy-path, copy-all-paths, and reveal actions                                      |
 | [meta](./delphitools/meta.md)                       | Implemented as a live metadata Form with title and description character-count guidance, optional URL/image/page type/site name/author/Twitter handle fields, copy meta tags action, and preview Detail                                                                              |
+| [noise](./delphitools/noise.md)                     | Implemented as a batch image file-picker Form that adds color noise with opacity, scale, and optional seed controls, writing to a temporary output directory with List results showing open, copy-image, copy-path, copy-all-paths, and reveal actions.                               |
+| [regex](./delphitools/regex.md)                     | Implemented as a live Regex Tester Form with pattern, flags, and text state; debounced execution, error display, highlight preview, character/byte offset table for matches and capture groups, and copy/clear actions                                                                |
 | [tailwind shades](./delphitools/tailwind-shades.md) | Implemented as a required base-colour Command argument with optional classic/vivid/muted/hue-shift mode, direct swatch List output, per-shade copy actions, and CSS variable, OKLCH variable, Tailwind config, and shade-scale copy actions                                          |
+| [preflight](./delphitools/preflight.md)             | Implemented as a single-PDF Form that validates file extension, runs CLI preflight --json and renders a premium Detail report with overall status, metadata, categorized issues, per-page details, and actions for opening, copying, and revealing the PDF |
+| [palette](./delphitools/palette.md)                 | Implemented as a live Palette Generator Command with strategy, size, seed, and lock/unlock controls; direct swatch Detail preview, copy actions (newline-separated hex, CSS variables, JSON), and PNG image export. |
+| [watermark](./delphitools/watermark.md)             | Implemented as a batch image file-picker Form that composites a watermark with position, opacity, and scale controls, writing to a temporary output directory with List results showing open, copy-image, copy-path, copy-all-paths, and reveal actions. |
+| [scroll](./delphitools/scroll.md)                   | Implemented as a single-image Form that splits wide images into Instagram carousel tiles with aspect ratio, fill mode, and custom color options; writes temporary output tiles with open, copy-image, copy-path, copy-all-paths, and reveal actions |
+| [svgo](./delphitools/svgo.md)                       | Implemented as a Form accepting SVG files or pasted SVG code; optimizes locally and displays results in a List of optimized files with size reduction details, or in a Detail view showing inline SVG preview and XML code; supports saving/downloading optimized SVG, copying XML content/file, and opening/revealing actions. |
+| [trace](./delphitools/trace.md)                     | Implemented as a single-image Form that traces raster images to SVG vector paths with preset, colours, and blur controls; renders premium Detail view with live SVG preview, XML code snippet, copy XML code, open SVG, copy SVG file, copy SVG path, and reveal actions. |
+| [zine](./delphitools/zine.md)                       | Implemented as a multi-file picker Form for exactly 8 images with paper size and DPI options, generating a single-sheet mini-zine PDF showing metadata and open, copy file, copy path, and reveal in Finder actions. |
+| [split](./delphitools/split.md)                     | Implemented as a single-image Form that splits images into a grid of tiles with row/column options, writing to a temporary output directory with List results showing open, copy-tile, copy-path, copy-all-paths, and reveal actions. |
+| [remove background](./delphitools/rmbg.md) | Implemented as a batch image file-picker Form that removes backgrounds using a local ONNX model with progress/model download warnings, writing to a temporary output directory with List results showing open, copy-image, copy-path, copy-all-paths, and reveal actions |
 
 ## Not planned (already in Raycast core)
 

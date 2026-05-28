@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect id="_bg_" width="512" height="512" x="0" y="0" rx="128" fill="url(#_gradient_)" stroke="#FFFFFF" stroke-width="0" stroke-opacity="100%" paint-order="stroke"></rect><clipPath id="clip"><use xlink:href="#_bg_"></use></clipPath><defs><radialGradient id="_gradient_" cx="50%" cy="50%" r="100%" fx="50%" fy="50%" gradientUnits="objectBoundingBox"><stop stop-color="#FAF5E6"></stop><stop offset="0.9" stop-color="#E7DBBB"></stop></radialGradient></defs><svg width="472" height="472" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" x="40" y="40" alignment-baseline="middle" style="color: rgb(42, 26, 0); width: 352px; height: 352px;">
+  <circle cx="180" cy="180" r="18" fill="#06490E" />
+  <circle cx="320" cy="200" r="28" fill="#06490E" />
+  <circle cx="220" cy="300" r="22" fill="#06490E" />
+  <circle cx="140" cy="330" r="14" fill="#06490E" />
+  <circle cx="350" cy="340" r="18" fill="#06490E" />
+  <circle cx="270" cy="120" r="32" fill="#06490E" />
+  <circle cx="110" cy="220" r="24" fill="#06490E" />
+  <circle cx="380" cy="130" r="16" fill="#06490E" />
+</svg>
+</svg>

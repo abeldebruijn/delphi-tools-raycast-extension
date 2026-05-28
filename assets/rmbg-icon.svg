@@ -1,0 +1,22 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect id="_bg_" width="512" height="512" x="0" y="0" rx="128" fill="url(#_gradient_)" stroke="#FFFFFF" stroke-width="0" stroke-opacity="100%" paint-order="stroke"></rect>
+  <clipPath id="clip"><use xlink:href="#_bg_"></use></clipPath>
+  <defs>
+    <radialGradient id="_gradient_" cx="50%" cy="50%" r="100%" fx="50%" fy="50%" gradientUnits="objectBoundingBox">
+      <stop stop-color="#FAF5E6"></stop>
+      <stop offset="0.9" stop-color="#E7DBBB"></stop>
+    </radialGradient>
+  </defs>
+  <svg width="472" height="472" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" x="40" y="40" alignment-baseline="middle" style="color: rgb(42, 26, 0); width: 352px; height: 352px;">
+    <!-- Background Grid to represent transparency/removed background -->
+    <path d="M100 140H412 M100 210H412 M100 280H412 M100 350H412 M146 100V412 M201 100V412 M256 100V412 M311 100V412 M366 100V412" stroke="#06490E" stroke-width="8" stroke-linecap="round" stroke-dasharray="12 16" opacity="0.3" />
+    
+    <!-- Cutout dashed border around the subject -->
+    <path d="M256 95 C320 95, 375 140, 375 220 C375 240, 370 260, 360 275 C390 285, 420 320, 420 395" stroke="#06490E" stroke-width="16" stroke-linecap="round" stroke-dasharray="24 16" />
+    <path d="M256 95 C192 95, 137 140, 137 220 C137 240, 142 260, 152 275 C122 285, 92 320, 92 395" stroke="#06490E" stroke-width="16" stroke-linecap="round" stroke-dasharray="24 16" />
+    
+    <!-- Subject Silhouette -->
+    <circle cx="256" cy="200" r="55" fill="#06490E" />
+    <path d="M166 380 C166 320, 196 290, 256 290 C316 290, 346 320, 346 380 Z" fill="#06490E" />
+  </svg>
+</svg>
