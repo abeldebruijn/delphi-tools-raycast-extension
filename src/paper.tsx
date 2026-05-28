@@ -17,10 +17,7 @@ import { join } from "node:path";
 import { promisify } from "node:util";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import {
-  DelphitoolsInstallStatusView,
-  getDelphitoolsInstallStatus,
-} from "./delphitools-install";
+import { DelphitoolsRequired } from "./delphitools-install";
 
 const execFileAsync = promisify(execFile);
 

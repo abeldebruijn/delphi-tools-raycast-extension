@@ -12,10 +12,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { useEffect, useRef, useState } from "react";
 
-import {
-  DelphitoolsInstallStatusView,
-  getDelphitoolsInstallStatus,
-} from "./delphitools-install";
+import { DelphitoolsRequired } from "./delphitools-install";
 
 const execFileAsync = promisify(execFile);
 

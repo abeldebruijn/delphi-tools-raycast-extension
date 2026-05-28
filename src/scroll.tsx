@@ -16,10 +16,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { useEffect, useState } from "react";
 
-import {
-  DelphitoolsInstallStatusView,
-  getDelphitoolsInstallStatus,
-} from "./delphitools-install";
+import { DelphitoolsRequired } from "./delphitools-install";
 
 const execFileAsync = promisify(execFile);
 
@@ -65,24 +62,12 @@ const FILL_MODES: Array<{ label: string; value: FillMode }> = [
 ];
 
 export default function Command() {
-  const [isDelphitoolsInstalled, setIsDelphitoolsInstalled] =
-    useState<boolean>();
-
-  useEffect(() => {
-    async function checkInstallStatus() {
-      const status = await getDelphitoolsInstallStatus();
-      setIsDelphitoolsInstalled(status.installed);
-    }
-
-    checkInstallStatus();
-  }, []);
-
-  if (isDelphitoolsInstalled === false) {
-    return <DelphitoolsInstallStatusView status={{ installed: false }} />;
-  }
-
   return (
-    <ScrollForm isCheckingInstall={isDelphitoolsInstalled === undefined} />
+    <DelphitoolsRequired>
+      {({ isCheckingInstall }) => (
+        <ScrollForm isCheckingInstall={isCheckingInstall} />
+      )}
+    </DelphitoolsRequired>
   );
 }
 

@@ -16,10 +16,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  DelphitoolsInstallStatusView,
-  getDelphitoolsInstallStatus,
-} from "./delphitools-install";
+import { DelphitoolsRequired } from "./delphitools-install";
 import { createTempSolidSwatchSvg } from "./swatch-png";
 
 const execFileAsync = promisify(execFile);

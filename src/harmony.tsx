@@ -13,10 +13,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { useEffect, useState } from "react";
 
-import {
-  DelphitoolsInstallStatusView,
-  getDelphitoolsInstallStatus,
-} from "./delphitools-install";
+import { DelphitoolsRequired } from "./delphitools-install";
 import { createTempSolidSwatchSvg } from "./swatch-png";
 
 const execFileAsync = promisify(execFile);

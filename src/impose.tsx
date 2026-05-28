@@ -14,12 +14,8 @@ import { mkdir, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
-import { useEffect, useState } from "react";
 
-import {
-  DelphitoolsInstallStatusView,
-  getDelphitoolsInstallStatus,
-} from "./delphitools-install";
+import { DelphitoolsRequired } from "./delphitools-install";
 
 const execFileAsync = promisify(execFile);
 
@@ -73,25 +69,12 @@ const LAYOUTS: Array<{ label: string; value: Layout; description: string }> = [
 const PAPER_SIZES = ["a4", "a3", "letter", "legal", "tabloid"];
 
 export default function Command() {
-  const [isDelphitoolsInstalled, setIsDelphitoolsInstalled] =
-    useState<boolean>();
-
-  useEffect(() => {
-    async function checkInstallStatus() {
-      const status = await getDelphitoolsInstallStatus();
-
-      setIsDelphitoolsInstalled(status.installed);
-    }
-
-    checkInstallStatus();
-  }, []);
-
-  if (isDelphitoolsInstalled === false) {
-    return <DelphitoolsInstallStatusView status={{ installed: false }} />;
-  }
-
   return (
-    <ImposeForm isCheckingInstall={isDelphitoolsInstalled === undefined} />
+    <DelphitoolsRequired>
+      {({ isCheckingInstall }) => (
+        <ImposeForm isCheckingInstall={isCheckingInstall} />
+      )}
+    </DelphitoolsRequired>
   );
 }
 

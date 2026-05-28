@@ -7,12 +7,8 @@ import {
   Toast,
   useNavigation,
 } from "@raycast/api";
-import { useEffect, useState } from "react";
 
-import {
-  DelphitoolsInstallStatusView,
-  getDelphitoolsInstallStatus,
-} from "./delphitools-install";
+import { DelphitoolsRequired } from "./delphitools-install";
 import {
   generateQr,
   parsePositiveInteger,
@@ -38,24 +34,12 @@ type FormValues = {
 };
 
 export default function Command() {
-  const [isDelphitoolsInstalled, setIsDelphitoolsInstalled] =
-    useState<boolean>();
-
-  useEffect(() => {
-    async function checkInstallStatus() {
-      const status = await getDelphitoolsInstallStatus();
-      setIsDelphitoolsInstalled(status.installed);
-    }
-
-    checkInstallStatus();
-  }, []);
-
-  if (isDelphitoolsInstalled === false) {
-    return <DelphitoolsInstallStatusView status={{ installed: false }} />;
-  }
-
   return (
-    <QrVCardForm isCheckingInstall={isDelphitoolsInstalled === undefined} />
+    <DelphitoolsRequired>
+      {({ isCheckingInstall }) => (
+        <QrVCardForm isCheckingInstall={isCheckingInstall} />
+      )}
+    </DelphitoolsRequired>
   );
 }
 

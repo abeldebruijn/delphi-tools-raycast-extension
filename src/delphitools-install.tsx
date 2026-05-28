@@ -1,6 +1,7 @@
 import { Action, ActionPanel, Detail, Icon } from "@raycast/api";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { ReactNode, useEffect, useState } from "react";
 
 const execFileAsync = promisify(execFile);
 const INSTALL_COMMAND = "cargo install delphitools-cli";
@@ -26,6 +27,32 @@ export async function getDelphitoolsInstallStatus(): Promise<DelphitoolsInstallS
       installed: false,
     };
   }
+}
+
+export function DelphitoolsRequired({
+  children,
+}: {
+  children: (props: { isCheckingInstall: boolean }) => ReactNode;
+}) {
+  const [isDelphitoolsInstalled, setIsDelphitoolsInstalled] =
+    useState<boolean>();
+
+  useEffect(() => {
+    async function checkInstallStatus() {
+      const status = await getDelphitoolsInstallStatus();
+      setIsDelphitoolsInstalled(status.installed);
+    }
+
+    checkInstallStatus();
+  }, []);
+
+  if (isDelphitoolsInstalled === false) {
+    return <DelphitoolsInstallStatusView status={{ installed: false }} />;
+  }
+
+  return children({
+    isCheckingInstall: isDelphitoolsInstalled === undefined,
+  });
 }
 
 export function DelphitoolsInstallStatusView({

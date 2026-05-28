@@ -14,12 +14,8 @@ import { mkdir, mkdtemp, readdir, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
-import { useEffect, useState } from "react";
 
-import {
-  DelphitoolsInstallStatusView,
-  getDelphitoolsInstallStatus,
-} from "./delphitools-install";
+import { DelphitoolsRequired } from "./delphitools-install";
 
 const execFileAsync = promisify(execFile);
 
@@ -43,25 +39,12 @@ const DEFAULT_SIZES = "16,32,48,180,512";
 const OUTPUT_NAMESPACE = "favicon";
 
 export default function Command() {
-  const [isDelphitoolsInstalled, setIsDelphitoolsInstalled] =
-    useState<boolean>();
-
-  useEffect(() => {
-    async function checkInstallStatus() {
-      const status = await getDelphitoolsInstallStatus();
-
-      setIsDelphitoolsInstalled(status.installed);
-    }
-
-    checkInstallStatus();
-  }, []);
-
-  if (isDelphitoolsInstalled === false) {
-    return <DelphitoolsInstallStatusView status={{ installed: false }} />;
-  }
-
   return (
-    <FaviconForm isCheckingInstall={isDelphitoolsInstalled === undefined} />
+    <DelphitoolsRequired>
+      {({ isCheckingInstall }) => (
+        <FaviconForm isCheckingInstall={isCheckingInstall} />
+      )}
+    </DelphitoolsRequired>
   );
 }
 

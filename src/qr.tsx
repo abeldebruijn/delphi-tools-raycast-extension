@@ -13,10 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import path from "node:path";
 
-import {
-  DelphitoolsInstallStatusView,
-  getDelphitoolsInstallStatus,
-} from "./delphitools-install";
+import { DelphitoolsRequired } from "./delphitools-install";
 import {
   generateQr,
   parsePositiveInteger,
