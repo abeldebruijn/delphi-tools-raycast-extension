@@ -16,6 +16,9 @@ Run local design and text utilities from [delphitools](https://tools.rmv.fyi/) i
 - Generate Barcode
 - Trim Transparent Edges
 - Convert Images
+- Print Imposer
+- Matte Generator
+- Meta Tag Generator
 - Generate Tailwind Shades
 - Compute Line Height
 - Paper Sizes
