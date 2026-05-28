@@ -16,7 +16,7 @@ import {
   DelphitoolsInstallStatusView,
   getDelphitoolsInstallStatus,
 } from "./delphitools-install";
-import { createTempSwatchPng, normaliseHexColour } from "./swatch-png";
+import { createTempSolidSwatchSvg, normaliseHexColour } from "./swatch-png";
 
 const execFileAsync = promisify(execFile);
 
@@ -193,8 +193,8 @@ function ColorBlindnessDetail({ result }: { result: ColorBlindnessResult }) {
     async function createPreview() {
       try {
         const nextSwatchPreview = {
-          sourcePath: await createSwatchPng(result.colour),
-          simulatedPath: await createSwatchPng(result.simulatedColour),
+          sourcePath: await createSwatchSvg(result.colour),
+          simulatedPath: await createSwatchSvg(result.simulatedColour),
         };
 
         if (!isMounted) {
@@ -410,8 +410,8 @@ function getOriginalHex(output: Record<string, unknown>): string | undefined {
   return undefined;
 }
 
-async function createSwatchPng(colour: string): Promise<string> {
-  return createTempSwatchPng({
+async function createSwatchSvg(colour: string): Promise<string> {
+  return createTempSolidSwatchSvg({
     colour,
     namespace: SWATCH_NAMESPACE,
   });
