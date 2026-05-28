@@ -6,9 +6,6 @@ Hardness estimates are for wrapping each `delphitools` command as a Raycast comm
 
 | Tool                                        | Extension hardness | Raycast ease | Progress    |
 | ------------------------------------------- | ------------------ | ------------ | ----------- |
-| [crop](./delphitools/crop.md)               | Moderate           | Moderate     | Not started |
-| [favicon](./delphitools/favicon.md)         | Moderate           | Moderate     | Not started |
-| [font-info](./delphitools/font-info.md)     | Moderate           | Moderate     | Not started |
 | [noise](./delphitools/noise.md)             | Moderate           | Moderate     | Not started |
 | [palette](./delphitools/palette.md)         | Moderate           | Easy         | Not started |
 | [preflight](./delphitools/preflight.md)     | Hard               | Moderate     | Not started |
