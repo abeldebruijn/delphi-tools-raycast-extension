@@ -195,7 +195,7 @@ function PaperListItem({
 
   return (
     <List.Item
-      icon={{ source: "paper-icon.svg" }}
+      icon={{ source: "paper-icon.png" }}
       title={size.name}
       subtitle={`${dimensions}${showPixels ? ` - ${pixelDimensions}` : ""}`}
       accessories={[
@@ -296,7 +296,7 @@ function ComparePicker({
         .map((size) => (
           <List.Item
             key={`${size.series}-${size.name}`}
-            icon={{ source: "paper-icon.svg" }}
+            icon={{ source: "paper-icon.png" }}
             title={size.name}
             subtitle={formatDimensions(size)}
             accessories={[{ text: size.series.toUpperCase() }]}
