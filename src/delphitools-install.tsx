@@ -1,7 +1,7 @@
 import { Action, ActionPanel, Detail, Icon } from "@raycast/api";
 import { ReactNode, useEffect, useState } from "react";
 
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
 
 const INSTALL_COMMAND = "cargo install delphitools-cli";
 
@@ -16,7 +16,9 @@ type DelphitoolsInstallStatus =
 
 export async function getDelphitoolsInstallStatus(): Promise<DelphitoolsInstallStatus> {
   try {
-    const { stdout } = await execFileAsync("delphitools", ["--version"]);
+    const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
+      "--version",
+    ]);
     return {
       installed: true,
       version: stdout.trim(),

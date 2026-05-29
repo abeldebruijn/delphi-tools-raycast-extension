@@ -1,7 +1,7 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getDefaultOutputRoot } from "./utils/preferences";
 import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
 export type QrErrorLevel = "L" | "M" | "Q" | "H";
@@ -35,12 +35,7 @@ export function getQrOutputPath({
     .digest("hex")
     .slice(0, 16);
 
-  return join(
-    tmpdir(),
-    "delphitools-raycast-extension",
-    "qr",
-    `qr-${size}-${hash}.png`,
-  );
+  return join(getDefaultOutputRoot(), "qr", `qr-${size}-${hash}.png`);
 }
 
 export async function generateQr(options: QrOptions): Promise<QrResult> {
@@ -68,7 +63,7 @@ export async function generateQr(options: QrOptions): Promise<QrResult> {
     args.splice(args.length - 1, 0, "--logo", options.logo);
   }
 
-  await execFileAsync("delphitools", args);
+  await execFileAsync(getDelphitoolsCliPath(), args);
 
   return {
     ...options,

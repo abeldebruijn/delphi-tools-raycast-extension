@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getDefaultOutputRoot } from "./utils/preferences";
 import {
   Action,
   ActionPanel,
@@ -11,7 +12,6 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { mkdir, stat } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import path from "node:path";
 import { useState } from "react";
 
@@ -281,7 +281,7 @@ ${getLayoutDescription(layout)}
 
 async function runImpose(values: FormValues): Promise<ImposeResult> {
   const inputPath = values.pdf[0];
-  const outputRoot = path.join(tmpdir(), "delphitools-raycast-extension");
+  const outputRoot = getDefaultOutputRoot();
   const outputDirectory = path.join(
     outputRoot,
     OUTPUT_NAMESPACE,
@@ -321,7 +321,7 @@ async function runImpose(values: FormValues): Promise<ImposeResult> {
   args.push("--output", outputPath, inputPath);
 
   await mkdir(outputDirectory, { recursive: true });
-  await execFileAsync("delphitools", args);
+  await execFileAsync(getDelphitoolsCliPath(), args);
 
   const outputStat = await stat(outputPath);
 

@@ -1,4 +1,4 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -261,7 +261,7 @@ function LineHeightActions({
             <Action
               key={recentFontSize}
               icon={Icon.Clock}
-              title={`Use ${recentFontSize}px as Font Size`}
+              title={`Use ${recentFontSize} Pixels as Font Size`}
               onAction={() => onFontSizeChange(recentFontSize)}
             />
           ))}
@@ -355,7 +355,7 @@ async function getRecentFontSizes(): Promise<string[]> {
 }
 
 async function runLineHeight(fontSize: string): Promise<LineHeightResult[]> {
-  const { stdout } = await execFileAsync("delphitools", [
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
     "line-height",
     fontSize,
     "--json",

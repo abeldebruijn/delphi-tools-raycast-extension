@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getDefaultOutputRoot } from "./utils/preferences";
 import {
   Action,
   ActionPanel,
@@ -11,7 +12,6 @@ import {
   Toast,
   useNavigation,
 } from "@raycast/api";
-import { tmpdir } from "node:os";
 import path from "node:path";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -662,7 +662,7 @@ async function runPaletteCli({
     args.push("--lock", lockStr);
   }
 
-  const { stdout } = await execFileAsync("delphitools", args);
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), args);
   return JSON.parse(stdout) as PaletteColor[];
 }
 
@@ -701,14 +701,13 @@ async function exportPalettePng({
     args.push("--lock", lockStr);
   }
 
-  await execFileAsync("delphitools", args);
+  await execFileAsync(getDelphitoolsCliPath(), args);
 }
 
 function getTempPngPath(): string {
   const uniqueId = Math.random().toString(36).substring(2, 10);
   return path.join(
-    tmpdir(),
-    "delphitools-raycast-extension",
+    getDefaultOutputRoot(),
     "palette",
     `palette-export-${uniqueId}.png`,
   );

@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getCliDebounceDelay } from "./utils/preferences";
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -143,7 +144,7 @@ function ShavianForm({ initialInput }: { initialInput: string }) {
         setIsProcessing(false);
         setIsGlossProcessing(false);
       }
-    }, 250);
+    }, getCliDebounceDelay());
 
     return () => {
       clearTimeout(timeout);
@@ -337,7 +338,7 @@ async function getInitialInput(): Promise<string> {
 }
 
 async function runShavian(input: string): Promise<string> {
-  const { stdout } = await execFileAsync("delphitools", [
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
     "shavian",
     "--quiet",
     input,
@@ -347,7 +348,7 @@ async function runShavian(input: string): Promise<string> {
 }
 
 async function runShavianGloss(input: string): Promise<GlossResult> {
-  const { stdout } = await execFileAsync("delphitools", [
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
     "shavian",
     "--json",
     "--gloss",

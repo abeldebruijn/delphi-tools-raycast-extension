@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getCliDebounceDelay } from "./utils/preferences";
 import {
   Action,
   ActionPanel,
@@ -115,7 +116,7 @@ function MetaForm() {
       } finally {
         setIsProcessing(false);
       }
-    }, 250);
+    }, getCliDebounceDelay());
 
     return () => {
       clearTimeout(timeout);
@@ -311,7 +312,7 @@ async function runMeta(values: FormValues): Promise<string> {
   appendOption(args, "--author", values.author);
   appendOption(args, "--twitter-handle", values.twitterHandle);
 
-  const { stdout } = await execFileAsync("delphitools", args);
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), args);
 
   return stdout.trimEnd();
 }

@@ -1,4 +1,4 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -313,7 +313,7 @@ async function runTailwindShades(
   colour: string,
   mode: ShadeMode,
 ): Promise<Shade[]> {
-  const { stdout } = await execFileAsync("delphitools", [
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
     "tailwind-shades",
     "--json",
     colour,
@@ -347,7 +347,7 @@ async function runTailwindShades(
 
 async function getOklchColour(colour: string): Promise<string | undefined> {
   try {
-    const { stdout } = await execFileAsync("delphitools", [
+    const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
       "colour",
       "--json",
       colour,

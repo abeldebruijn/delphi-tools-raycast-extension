@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getCliDebounceDelay } from "./utils/preferences";
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -136,7 +137,7 @@ function HashForm({
       } finally {
         setIsProcessing(false);
       }
-    }, 250);
+    }, getCliDebounceDelay());
 
     return () => {
       clearTimeout(timeout);
@@ -275,7 +276,7 @@ async function runHash(
     return createHash("sha1").update(input).digest("hex");
   }
 
-  const { stdout } = await execFileAsync("delphitools", [
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
     "hash",
     "--quiet",
     algorithm,

@@ -1,4 +1,4 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
 import {
   Action,
   ActionPanel,
@@ -157,7 +157,7 @@ function FontInfoDetail({ result }: { result: FontInfoResult }) {
 }
 
 async function runFontInfo(fontPath: string): Promise<FontInfoResult> {
-  const { stdout } = await execFileAsync("delphitools", [
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
     "font-info",
     "--json",
     "--quiet",

@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getDefaultOutputRoot } from "./utils/preferences";
 import {
   Action,
   ActionPanel,
@@ -13,7 +14,6 @@ import {
 } from "@raycast/api";
 import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { useEffect, useState } from "react";
 
@@ -367,7 +367,7 @@ async function generateBarcode({
   const outputPath = getOutputPath({ data, format, height, scale });
 
   await mkdir(dirname(outputPath), { recursive: true });
-  await execFileAsync("delphitools", [
+  await execFileAsync(getDelphitoolsCliPath(), [
     "barcode",
     "--quiet",
     "--format",
@@ -407,8 +407,7 @@ function getOutputPath({
     .slice(0, 16);
 
   return join(
-    tmpdir(),
-    "delphitools-raycast-extension",
+    getDefaultOutputRoot(),
     OUTPUT_NAMESPACE,
     `${format}-${height}-${scale}-${hash}.png`,
   );
@@ -491,7 +490,7 @@ async function writeFormatPreviewImages(): Promise<
       const outputPath = getFormatPreviewPath(format);
 
       await mkdir(dirname(outputPath), { recursive: true });
-      await execFileAsync("delphitools", [
+      await execFileAsync(getDelphitoolsCliPath(), [
         "barcode",
         "--quiet",
         "--format",
@@ -514,8 +513,7 @@ async function writeFormatPreviewImages(): Promise<
 
 function getFormatPreviewPath(format: BarcodeFormatOption): string {
   return join(
-    tmpdir(),
-    "delphitools-raycast-extension",
+    getDefaultOutputRoot(),
     OUTPUT_NAMESPACE,
     "format-previews",
     `${format.value}-${format.previewData.toLowerCase()}-${FORMAT_PREVIEW_VERSION}.png`,

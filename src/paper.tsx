@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getDefaultOutputRoot } from "./utils/preferences";
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -12,7 +13,6 @@ import {
   Toast,
 } from "@raycast/api";
 import { mkdir, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -485,7 +485,7 @@ async function loadPaperSizes(
       : [series];
   const results = await Promise.all(
     seriesToLoad.map(async (nextSeries) => {
-      const { stdout } = await execFileAsync("delphitools", [
+      const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
         "paper",
         "--series",
         nextSeries,
@@ -592,7 +592,7 @@ function formatArea(size: PaperSize) {
 }
 
 async function writeComparisonSvg(left: PaperSize, right: PaperSize) {
-  const directory = join(tmpdir(), "delphi-tools-raycast-extension");
+  const directory = join(getDefaultOutputRoot(), "paper");
   const filePath = join(
     directory,
     `paper-${left.name.toLowerCase()}-${right.name.toLowerCase()}.svg`,

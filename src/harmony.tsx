@@ -17,7 +17,7 @@ import {
 } from "./delphitools-install";
 import { createTempSolidSwatchSvg } from "./swatch-png";
 import { hexToRgb, rgbToHex } from "./utils/color";
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
 
 type HarmonyType =
   | "complementary"
@@ -346,7 +346,7 @@ async function runHarmony(
   const cliHarmonyType = getCliHarmonyType(harmonyType);
 
   if (cliHarmonyType) {
-    const { stdout } = await execFileAsync("delphitools", [
+    const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
       "harmony",
       "--json",
       colour,
@@ -370,7 +370,7 @@ async function runHarmony(
 }
 
 async function normaliseColour(colour: string): Promise<string> {
-  const { stdout } = await execFileAsync("delphitools", [
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
     "colour",
     "--json",
     colour,

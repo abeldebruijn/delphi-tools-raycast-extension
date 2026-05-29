@@ -1,4 +1,4 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
 import {
   Action,
   ActionPanel,
@@ -232,7 +232,7 @@ function PreflightDetail({
 async function runPreflight(pdfPath: string): Promise<PreflightReport> {
   let stdout: string;
   try {
-    const result = await execFileAsync("delphitools", [
+    const result = await execFileAsync(getDelphitoolsCliPath(), [
       "preflight",
       "--json",
       "--quiet",

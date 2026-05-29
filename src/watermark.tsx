@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getDefaultOutputRoot } from "./utils/preferences";
 import {
   Action,
   ActionPanel,
@@ -11,7 +12,6 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { mkdir, readdir, stat } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import path from "node:path";
 
 import { DelphitoolsRequired } from "./delphitools-install";
@@ -247,7 +247,7 @@ function WatermarkActions({
 }
 
 async function runWatermark(values: FormValues): Promise<WatermarkResult> {
-  const outputRoot = path.join(tmpdir(), "delphitools-raycast-extension");
+  const outputRoot = getDefaultOutputRoot();
   await mkdir(outputRoot, { recursive: true });
 
   const hash = Math.random().toString(36).slice(2, 10);
@@ -283,7 +283,7 @@ async function runWatermark(values: FormValues): Promise<WatermarkResult> {
     args.push("--scale", scale);
   }
 
-  await execFileAsync("delphitools", args);
+  await execFileAsync(getDelphitoolsCliPath(), args);
 
   const outputs = await getOutputFiles(outputDirectory);
 

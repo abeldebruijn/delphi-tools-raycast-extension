@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getCliDebounceDelay } from "./utils/preferences";
 import {
   Action,
   ActionPanel,
@@ -158,7 +159,7 @@ function CodecForm({
       } finally {
         setIsProcessing(false);
       }
-    }, 250);
+    }, getCliDebounceDelay());
 
     return () => {
       clearTimeout(timeout);
@@ -295,7 +296,7 @@ async function runTextCodec(
   encoding: Encoding,
   input: string,
 ): Promise<string> {
-  const { stdout } = await execFileAsync("delphitools", [
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
     operation,
     "--quiet",
     encoding,

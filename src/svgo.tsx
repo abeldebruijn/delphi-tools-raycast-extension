@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getDefaultOutputRoot } from "./utils/preferences";
 import {
   Action,
   ActionPanel,
@@ -20,7 +21,6 @@ import {
   stat,
   writeFile,
 } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import path from "node:path";
 import { useEffect, useState } from "react";
 
@@ -410,7 +410,7 @@ function SaveSvgForm({
 }
 
 async function runSvgo(values: FormValues): Promise<SvgoResult> {
-  const outputRoot = path.join(tmpdir(), "delphitools-raycast-extension");
+  const outputRoot = getDefaultOutputRoot();
   await mkdir(outputRoot, { recursive: true });
 
   const outputDirectory = await mkdtemp(path.join(outputRoot, "svgo-output-"));
@@ -439,7 +439,7 @@ async function runSvgo(values: FormValues): Promise<SvgoResult> {
     const originalStat = await stat(inputPath);
 
     // Run delphitools svgo
-    await execFileAsync("delphitools", [
+    await execFileAsync(getDelphitoolsCliPath(), [
       "svgo",
       "--quiet",
       "--output",

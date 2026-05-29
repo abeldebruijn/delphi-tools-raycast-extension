@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getDefaultOutputRoot } from "./utils/preferences";
 import {
   Action,
   ActionPanel,
@@ -11,7 +12,6 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { mkdir, readdir } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import path from "node:path";
 import { useEffect, useState } from "react";
 
@@ -194,14 +194,13 @@ function ClipActions({
 
 async function runClip(images: string[]): Promise<ClipResult> {
   const outputDirectory = path.join(
-    tmpdir(),
-    "delphitools-raycast-extension",
+    getDefaultOutputRoot(),
     OUTPUT_NAMESPACE,
     `${Date.now()}`,
   );
 
   await mkdir(outputDirectory, { recursive: true });
-  await execFileAsync("delphitools", [
+  await execFileAsync(getDelphitoolsCliPath(), [
     "clip",
     "--quiet",
     "--output",

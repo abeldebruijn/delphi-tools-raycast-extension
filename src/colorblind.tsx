@@ -1,4 +1,4 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -298,7 +298,7 @@ async function runColorBlindnessSimulation(
   colour: string,
   type: ColorBlindnessType,
 ): Promise<ColorBlindnessCliResult> {
-  const { stdout } = await execFileAsync("delphitools", [
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
     "colorblind",
     "--json",
     "--colour",

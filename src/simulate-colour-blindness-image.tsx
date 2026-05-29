@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getDefaultOutputRoot } from "./utils/preferences";
 import {
   Action,
   ActionPanel,
@@ -12,7 +13,6 @@ import {
 } from "@raycast/api";
 import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import path from "node:path";
 import { useEffect, useState } from "react";
 
@@ -300,7 +300,7 @@ async function runImageSimulation({
   const outputPath = getOutputPath(inputPath, type);
 
   await mkdir(path.dirname(outputPath), { recursive: true });
-  await execFileAsync("delphitools", [
+  await execFileAsync(getDelphitoolsCliPath(), [
     "colorblind",
     "--quiet",
     "--cb-type",
@@ -325,8 +325,7 @@ function getOutputPath(inputPath: string, type: ColorBlindnessType): string {
     .slice(0, 16);
 
   return path.join(
-    tmpdir(),
-    "delphitools-raycast-extension",
+    getDefaultOutputRoot(),
     OUTPUT_NAMESPACE,
     `${path.basename(inputPath, extension)}-${type}-${hash}${extension}`,
   );

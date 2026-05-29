@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getDefaultOutputRoot } from "./utils/preferences";
 import {
   Action,
   ActionPanel,
@@ -11,7 +12,6 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { mkdir, readFile, stat } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import path from "node:path";
 import { useEffect, useState } from "react";
 
@@ -235,7 +235,7 @@ function TraceResultActions({ result }: { result: TraceResult }) {
 
 async function runTrace(values: FormValues): Promise<TraceResult> {
   const inputPath = values.image[0];
-  const outputRoot = path.join(tmpdir(), "delphitools-raycast-extension");
+  const outputRoot = getDefaultOutputRoot();
   const outputDirectory = path.join(
     outputRoot,
     OUTPUT_NAMESPACE,
@@ -261,7 +261,7 @@ async function runTrace(values: FormValues): Promise<TraceResult> {
   args.push("--output", outputPath, inputPath);
 
   await mkdir(outputDirectory, { recursive: true });
-  await execFileAsync("delphitools", args);
+  await execFileAsync(getDelphitoolsCliPath(), args);
 
   const outputStat = await stat(outputPath);
 

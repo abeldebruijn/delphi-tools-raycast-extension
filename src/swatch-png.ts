@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import path from "node:path";
+
+import { getDefaultOutputRoot } from "./utils/preferences";
 import { deflateSync } from "node:zlib";
 
 import { hexToRgbOrThrow } from "./utils/color";
@@ -151,8 +152,7 @@ function getTempSwatchPath({
   const fileSafeNamespace = namespace.replace(/[^a-zA-Z0-9_-]/g, "-");
 
   return path.join(
-    tmpdir(),
-    "delphitools-raycast-extension",
+    getDefaultOutputRoot(),
     fileSafeNamespace,
     `swatch-${width}x${height}-${hex.slice(1)}.svg`,
   );
@@ -176,8 +176,7 @@ function getTempTextSwatchPath({
   const fileSafeNamespace = namespace.replace(/[^a-zA-Z0-9_-]/g, "-");
 
   return path.join(
-    tmpdir(),
-    "delphitools-raycast-extension",
+    getDefaultOutputRoot(),
     fileSafeNamespace,
     `text-swatch-${width}x${height}-${backgroundHex.slice(1)}-${foregroundHex.slice(1)}.${extension}`,
   );

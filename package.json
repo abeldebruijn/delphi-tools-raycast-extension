@@ -24,6 +24,32 @@
     "typescript": "^5.8.2"
   },
   "icon": "extension-icon.png",
+  "preferences": [
+    {
+      "name": "cliPath",
+      "title": "CLI Path",
+      "description": "Path to the delphitools executable. Leave empty to use delphitools from PATH.",
+      "type": "textfield",
+      "required": false,
+      "placeholder": "delphitools"
+    },
+    {
+      "name": "defaultOutputDirectory",
+      "title": "Default Output Directory",
+      "description": "Directory for generated files. Leave empty to use the system temporary directory.",
+      "type": "directory",
+      "required": false
+    },
+    {
+      "name": "cliDebounceDelay",
+      "title": "CLI Debounce Delay",
+      "description": "Delay in milliseconds before live commands run delphitools after input changes.",
+      "type": "textfield",
+      "required": false,
+      "placeholder": "250",
+      "default": "250"
+    }
+  ],
   "commands": [
     {
       "mode": "view",

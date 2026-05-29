@@ -18,7 +18,8 @@ import {
 } from "./delphitools-install";
 import { createTempTextSwatchSvg } from "./swatch-png";
 import { getContrastRatio, hexToRgb, rgbToHex } from "./utils/color";
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getCliDebounceDelay } from "./utils/preferences";
 
 type FormValues = {
   fg: string;
@@ -206,7 +207,7 @@ function ContrastForm({
       } finally {
         setIsProcessing(false);
       }
-    }, 250);
+    }, getCliDebounceDelay());
 
     return () => {
       clearTimeout(timeout);
@@ -547,7 +548,7 @@ async function getInitialColour(): Promise<string> {
 }
 
 async function runContrast(fg: string, bg: string): Promise<ContrastResult> {
-  const { stdout } = await execFileAsync("delphitools", [
+  const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
     "contrast",
     "--json",
     fg,

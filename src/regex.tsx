@@ -1,4 +1,5 @@
-import { execFileAsync } from "./utils/exec";
+import { execFileAsync, getDelphitoolsCliPath } from "./utils/exec";
+import { getCliDebounceDelay } from "./utils/preferences";
 import type { LaunchProps } from "@raycast/api";
 import {
   Action,
@@ -159,7 +160,7 @@ function RegexForm({
       } finally {
         setIsProcessing(false);
       }
-    }, 250);
+    }, getCliDebounceDelay());
 
     return () => {
       clearTimeout(timeout);
@@ -408,7 +409,7 @@ async function runRegex(
   text: string,
 ): Promise<RegexMatch[]> {
   try {
-    const { stdout } = await execFileAsync("delphitools", [
+    const { stdout } = await execFileAsync(getDelphitoolsCliPath(), [
       "regex",
       "--json",
       "--quiet",

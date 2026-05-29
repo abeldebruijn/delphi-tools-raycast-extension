@@ -36,6 +36,10 @@ _Avoid_: Action, Raycast Tool
 A Raycast package that adds functionality to Raycast. An Extension contains one or more Commands and can be installed from the Raycast Store.
 _Avoid_: App, plugin, script
 
+**Extension Preference**:
+A user-configurable setting that applies across Commands in the Raycast Extension unless a Command has a more specific reason to override it.
+_Avoid_: Global setting, config flag
+
 **Manifest**:
 The package.json file for a Raycast Extension. It is an npm package manifest plus Raycast-specific metadata used to identify and publish the Extension.
 _Avoid_: CLI Manifest, config file
